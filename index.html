@@ -1694,9 +1694,7 @@ function getCadetSitrepLines(squad) {
             c.statuses.some(s => s.category === category.name)
         );
 
-        if (!matching.length) return;
-
-        lines.push(`${category.name}: ${matching.length}`);
+        lines.push(`*${category.name} - ${matching.length}*`);
 
         matching.forEach(cadet => {
             const statuses = cadet.statuses.filter(
@@ -1704,14 +1702,12 @@ function getCadetSitrepLines(squad) {
             );
 
             statuses.forEach(status => {
-                let line = `- ${cadet.name}`;
+                let line = `${cadet.name}`;
 
                 if (status.reason) {
                     line += ` (${status.reason})`;
-                }
-
-                if (status.start || status.end) {
-                    line += ` [${formatDate(status.start) || "-"} to ${formatDate(status.end) || "Ongoing"}]`;
+                } else if (status.start || status.end) {
+                    line += ` (${category.name}: ${formatDateShort(status.start)} - ${formatDateShort(status.end)})`;
                 }
 
                 lines.push(line);
@@ -1724,41 +1720,49 @@ function getCadetSitrepLines(squad) {
     return lines;
 }
 
+function formatDateShort(date) {
+    if (!date) return "";
+    const parts = date.split("-");
+    return `${parts[2]}/${parts[1]}/${parts[0].slice(2)}`;
+}
+
 function buildSitrep() {
     const strength = getStrength(selectedSquad);
+    const date = document.getElementById("sitrepDate").value;
+    const name = document.getElementById("icName").value.trim();
+
     const lines = [];
 
-    lines.push(getGreetingText());
+    lines.push(
+        `${timeGreeting()} sirs. I am OCT ${name} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`
+    );
+
     lines.push("");
-    lines.push(`SITREP - ${selectedSquad}`);
-    lines.push(`Date: ${formatDate(document.getElementById("sitrepDate").value)}`);
-    lines.push(`Current Strength: ${strength.current}/${strength.total}`);
+
+    lines.push(
+        `Sitrep for ${selectedSquad} dated: *${formatDateShort(date)}*`
+    );
+
+    lines.push(`Total Strength - ${strength.total}`);
+    lines.push(`Current Strength - ${strength.current}`);
+
     lines.push("");
 
-    lines.push("STATUS:");
-    const statusLines = getCadetSitrepLines(selectedSquad);
+    lines.push(...getCadetSitrepLines(selectedSquad));
 
-    if (statusLines.length) {
-        lines.push(...statusLines);
-    } else {
-        lines.push("All cadets present.");
-        lines.push("");
-    }
+    lines.push("*CM/FI further instructions*");
 
-    lines.push("MOVEMENT TIMELINE:");
+    lines.push("");
+
+    lines.push("*Timeline :*");
 
     if (state.timeline.entries.length) {
         state.timeline.entries.forEach(entry => {
             lines.push(
-                `${formatDate(entry.date)} ${formatTime(entry.time)} - ${entry.text}`
+                `${formatTime(entry.time)} - ${entry.text}`
             );
         });
-    } else {
-        lines.push("No movement updates recorded.");
     }
-
-    lines.push("");
-    lines.push("End of SITREP.");
 
     return lines.join("\n");
 }
