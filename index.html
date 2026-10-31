@@ -8,17 +8,15 @@
 <style>
 :root {
   --bg:#f3f6fa; --card:#fff; --text:#172333; --muted:#687789;
-  --blue:#1769aa; --blue2:#e8f2fc; --green:#198754;
-  --red:#c0392b; --orange:#d97706; --border:#dce3eb;
+  --blue:#1769aa; --green:#198754; --red:#c0392b;
+  --orange:#d97706; --border:#dce3eb;
 }
 * { box-sizing:border-box; }
 body {
   margin:0; background:var(--bg); color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
 }
-header {
-  background:#123b5d; color:white; padding:18px 16px;
-}
+header { background:#123b5d; color:white; padding:18px 16px; }
 header h1 { margin:0; font-size:21px; }
 header p { margin:5px 0 0; font-size:12px; opacity:.85; }
 main { max-width:1000px; margin:auto; padding:14px; }
@@ -73,10 +71,10 @@ textarea { min-height:240px; resize:vertical; line-height:1.5; }
 .stats { display:flex; gap:8px; margin-bottom:12px; }
 .stat {
   flex:1; background:#f1f5f9; border-radius:8px;
-  padding:6px 9px; min-width:0;
+  padding:8px 9px; min-width:0;
 }
-.stat-label { color:var(--muted); font-size:10px; }
-.stat-value { font-size:16px; font-weight:800; margin-top:2px; }
+.stat-label { color:var(--muted); font-size:10px; margin-bottom:5px; }
+.stat input { font-size:17px; font-weight:800; padding:7px; }
 .movement-status {
   background:#f0f5fa; border-radius:8px; padding:10px;
   font-size:13px; margin-bottom:12px;
@@ -103,12 +101,6 @@ textarea { min-height:240px; resize:vertical; line-height:1.5; }
 }
 .cadet-tile.absent { background:#fff2e8; border-color:#f1c99e; }
 .cadet-tile.present { background:#eff8f2; border-color:#c4e4ce; }
-.category-row {
-  display:flex; align-items:center; gap:8px; padding:8px 0;
-  border-bottom:1px solid var(--border); font-size:13px;
-}
-.category-row span { flex:1; }
-.category-row input { width:auto; }
 .modal {
   position:fixed; inset:0; background:#0008; z-index:10;
   display:flex; align-items:center; justify-content:center;
@@ -118,11 +110,6 @@ textarea { min-height:240px; resize:vertical; line-height:1.5; }
   width:min(560px,100%); max-height:92vh; overflow:auto;
   background:white; border-radius:13px; padding:17px;
 }
-.status-item {
-  border:1px solid var(--border); border-radius:8px;
-  padding:9px; margin:7px 0; font-size:12px;
-}
-.status-item button { min-height:32px; padding:6px 9px; }
 hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
 @media(max-width:480px) {
   main { padding:10px; }
@@ -163,30 +150,33 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
           <input id="icName" placeholder="Enter IC name" oninput="updateGreetingFromIC()">
         </div>
       </div>
+
       <div style="margin-top:10px">
         <label>Greeting (editable)</label>
         <textarea id="greeting" style="min-height:75px" oninput="saveGreeting()"></textarea>
       </div>
+
       <div class="row" style="margin-top:10px">
         <div class="field">
-          <label>Date</label>
+          <label>SITREP Date</label>
           <input id="sitrepDate" type="date" onchange="refreshOutput()">
         </div>
         <div class="field">
-          <label>Time</label>
+          <label>SITREP Time</label>
           <input id="sitrepTime" type="time" onchange="refreshOutput()">
         </div>
       </div>
     </div>
 
+    <!-- MANUAL STRENGTH -->
     <div class="stats">
       <div class="stat">
         <div class="stat-label">Current Strength</div>
-        <div class="stat-value" id="currentStrength">24</div>
+        <input id="currentStrength" type="number" min="0" step="1" onchange="updateManualStrength()">
       </div>
       <div class="stat">
         <div class="stat-label">Total Strength</div>
-        <div class="stat-value" id="totalStrength">24</div>
+        <input id="totalStrength" type="number" min="0" step="1" onchange="updateManualStrength()">
       </div>
     </div>
 
@@ -259,7 +249,7 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
 
     <div class="card">
       <h2>Reset Movement</h2>
-      <p class="muted">This clears the current movement timeline and allows you to start a new SITREP. It does not delete cadet statuses.</p>
+      <p class="muted">This clears the current movement timeline and allows you to start a new SITREP. It does not delete cadet statuses or manual strength figures.</p>
       <button class="red full" onclick="resetMovement()">Reset Movement</button>
     </div>
   </section>
@@ -268,120 +258,55 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
   <section id="cadetsPage" class="hidden">
     <div class="card">
       <h2>Cadet Status</h2>
-      <div class="row">
-        <div class="field">
-          <label>Squad</label>
-          <select id="cadetSquad" onchange="renderCadets()">
-            <option>OCT 3</option>
-            <option>OCT 4</option>
-          </select>
-        </div>
+      <div class="field">
+        <label>Squad</label>
+        <select id="cadetSquad" onchange="renderCadets()">
+          <option>OCT 3</option>
+          <option>OCT 4</option>
+        </select>
       </div>
-      <div class="stats" style="margin-top:12px">
-        <div class="stat">
-          <div class="stat-label">Current Strength</div>
-          <div class="stat-value" id="cadetCurrentStrength">24</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Total Strength</div>
-          <div class="stat-value" id="cadetTotalStrength">24</div>
-        </div>
-      </div>
-      <p class="muted">Select a cadet to edit their details, statuses or temporary squad attachment.</p>
+      <p class="muted" style="margin-top:12px">Select a cadet to assign or update their status. Each cadet can have only one status at a time.</p>
     </div>
 
     <div class="card">
       <h2>Cadets</h2>
       <div id="cadetGroups"></div>
     </div>
-
-    <div class="card">
-      <h2>Category Settings</h2>
-      <p class="muted">Choose which categories reduce current strength. A cadet with multiple deducting statuses is only counted once.</p>
-      <div id="categorySettings"></div>
-      <hr>
-      <div class="row">
-        <div class="field">
-          <label>New Category</label>
-          <input id="newCategory" placeholder="Category name">
-        </div>
-        <button class="primary" onclick="addCategory()">Add Category</button>
-      </div>
-    </div>
   </section>
 </main>
 
-<!-- CADET EDITOR -->
+<!-- SIMPLE CADET STATUS EDITOR -->
 <div id="cadetModal" class="modal hidden">
   <div class="modal-content">
-    <h2>Edit Cadet</h2>
+    <h2 id="editCadetTitle">Cadet Status</h2>
     <input type="hidden" id="editingCadetId">
 
     <div class="field">
-      <label>Cadet Name</label>
-      <input id="editCadetName">
+      <label>Status Category</label>
+      <select id="editStatusCategory" onchange="toggleOtherReason()"></select>
     </div>
 
     <div class="field" style="margin-top:10px">
-      <label>Permanent Squad</label>
-      <select id="editCadetSquad">
-        <option>OCT 3</option>
-        <option>OCT 4</option>
-      </select>
+      <label>Start Date</label>
+      <input id="editStatusStart" type="date">
     </div>
 
-    <hr>
-    <h3>Current Statuses</h3>
-    <div id="cadetStatusList"></div>
-
-    <hr>
-    <h3>Add Status</h3>
-    <div class="field">
-      <label>Category</label>
-      <select id="newStatusCategory"></select>
+    <div class="field" style="margin-top:10px">
+      <label>End Date</label>
+      <input id="editStatusEnd" type="date">
     </div>
-    <div class="field" style="margin-top:9px">
+
+    <div class="field" style="margin-top:10px" id="statusReasonField">
       <label>Reason / Remarks (optional)</label>
-      <input id="newStatusReason" placeholder="Enter reason or remarks">
-    </div>
-    <div class="row" style="margin-top:9px">
-      <div class="field">
-        <label>Start Date</label>
-        <input id="newStatusStart" type="date">
-      </div>
-      <div class="field">
-        <label>End Date</label>
-        <input id="newStatusEnd" type="date">
-      </div>
-    </div>
-    <button class="secondary full" style="margin-top:9px" onclick="addCadetStatus()">Add Status</button>
-
-    <hr>
-    <h3>Temporary Squad Attachment</h3>
-    <p class="muted">This changes which squad the cadet is counted under during the attachment period. Their permanent squad remains unchanged.</p>
-    <div class="field">
-      <label>Attach to Squad</label>
-      <select id="attachmentSquad">
-        <option value="">No attachment</option>
-        <option>OCT 3</option>
-        <option>OCT 4</option>
-      </select>
-    </div>
-    <div class="row" style="margin-top:9px">
-      <div class="field">
-        <label>Start Date</label>
-        <input id="attachmentStart" type="date">
-      </div>
-      <div class="field">
-        <label>End Date</label>
-        <input id="attachmentEnd" type="date">
-      </div>
+      <input id="editStatusReason" placeholder="e.g. Experiencing cough-like symptoms">
     </div>
 
     <div class="row" style="margin-top:16px">
-      <button class="primary full" onclick="saveCadetDetails()">Save Changes</button>
-      <button class="secondary full" onclick="closeCadetModal()">Close</button>
+      <button class="primary full" onclick="saveCadetStatus()">Save Status</button>
+      <button class="secondary full" onclick="closeCadetModal()">Cancel</button>
     </div>
+
+    <button class="red full" id="clearStatusButton" style="margin-top:8px" onclick="clearCadetStatus()">Clear Status / Set as Present</button>
   </div>
 </div>
 
@@ -392,24 +317,26 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
 
 const STORAGE_KEY = "octSitrepSystemV2";
 
-const defaultCategories = [
-  {name:"MO",deduct:true},
-  {name:"LD",deduct:true},
-  {name:"RMJ",deduct:true},
-  {name:"Fallouts",deduct:false},
-  {name:"MC recovery",deduct:false},
-  {name:"MC",deduct:true},
-  {name:"Gatepass",deduct:true},
-  {name:"Compassionate Leave",deduct:true},
-  {name:"Booking In from MC",deduct:false},
-  {name:"Not Participating",deduct:false},
-  {name:"Booked out",deduct:true},
-  {name:"Scheduled",deduct:false},
-  {name:"Provost",deduct:false}
+const statusCategories = [
+  "MO",
+  "LD",
+  "RMJ",
+  "Fallouts",
+  "MC recovery",
+  "MC",
+  "Gatepass",
+  "Compassionate Leave",
+  "Booking In from MC",
+  "Not Participating",
+  "Booked out",
+  "Scheduled",
+  "Provost",
+  "Others"
 ];
 
 function makeDefaultCadets() {
   const list = [];
+
   ["OCT 3","OCT 4"].forEach(squad => {
     for (let i=1;i<=24;i++) {
       list.push({
@@ -421,12 +348,19 @@ function makeDefaultCadets() {
       });
     }
   });
+
   return list;
+}
+
+function makeDefaultStrengths() {
+  return {
+    "OCT 3":{current:24,total:24},
+    "OCT 4":{current:24,total:24}
+  };
 }
 
 const defaultState = {
   cadets:makeDefaultCadets(),
-  categories:defaultCategories,
   timeline:{
     squad:"OCT 3",
     icName:"",
@@ -437,7 +371,8 @@ const defaultState = {
     currentLocation:"",
     destination:"",
     entries:[],
-    output:""
+    output:"",
+    strengths:makeDefaultStrengths()
   }
 };
 
@@ -447,16 +382,29 @@ function loadState() {
     if (!saved) return structuredClone(defaultState);
 
     const result = {...structuredClone(defaultState),...saved};
+
     result.timeline = {
       ...structuredClone(defaultState.timeline),
       ...(saved.timeline || {})
     };
-    result.categories = saved.categories || structuredClone(defaultCategories);
+
     result.cadets = saved.cadets || makeDefaultCadets();
+
+    // Migrate older saved data to manual strength values.
+    result.timeline.strengths = {
+      ...makeDefaultStrengths(),
+      ...(result.timeline.strengths || {})
+    };
+
+    // Ensure every cadet has a statuses array.
+    result.cadets.forEach(cadet => {
+      if (!Array.isArray(cadet.statuses)) cadet.statuses = [];
+    });
 
     if (!result.timeline.stage) {
       result.timeline.stage = result.timeline.started ? "choices" : "initial";
     }
+
     return result;
   } catch (error) {
     return structuredClone(defaultState);
@@ -552,6 +500,11 @@ function escapeHtml(value) {
   }[char]));
 }
 
+function getCadetStatus(cadet) {
+  // Older saved versions used a statuses array. Use the first status only.
+  return cadet.statuses && cadet.statuses.length ? cadet.statuses[0] : null;
+}
+
 /* ------------------------------
    PAGE NAVIGATION
 ------------------------------ */
@@ -561,18 +514,20 @@ function showPage(page) {
   document.getElementById("cadetsPage").classList.toggle("hidden",page!=="cadets");
   document.getElementById("timelineTab").className = page==="timeline" ? "active-tab" : "secondary";
   document.getElementById("cadetTab").className = page==="cadets" ? "active-tab" : "secondary";
+
   if (page==="cadets") renderCadets();
 }
 
 /* ------------------------------
-   SQUAD AND GREETING
+   SQUAD, GREETING AND STRENGTH
 ------------------------------ */
 
 function selectSquad() {
   selectedSquad = document.getElementById("squad").value;
   state.timeline.squad = selectedSquad;
+
+  loadManualStrength();
   updateGreetingFromIC();
-  updateStrengthDisplays();
   refreshOutput();
   saveState();
 }
@@ -585,6 +540,7 @@ function updateGreetingFromIC() {
   state.timeline.icName = name;
   state.timeline.greeting = greeting;
   state.timeline.squad = selectedSquad;
+
   saveState();
 }
 
@@ -592,154 +548,131 @@ function getGreetingText() {
   return document.getElementById("greeting").value.trim();
 }
 
-/* ------------------------------
-   CADET STATUS AND STRENGTH
------------------------------- */
+function loadManualStrength() {
+  const strength = state.timeline.strengths[selectedSquad] || {current:24,total:24};
 
-function activeAttachment(cadet) {
-  const a = cadet.attachment;
-  if (!a || !a.squad || !a.start) return false;
-  const now = today();
-  return a.start <= now && (!a.end || a.end >= now);
+  document.getElementById("currentStrength").value = strength.current;
+  document.getElementById("totalStrength").value = strength.total;
 }
 
-function squadOf(cadet) {
-  return activeAttachment(cadet) ? cadet.attachment.squad : cadet.squad;
-}
+function updateManualStrength() {
+  const current = Number(document.getElementById("currentStrength").value);
+  const total = Number(document.getElementById("totalStrength").value);
 
-function cadetDeducts(cadet) {
-  return cadet.statuses.some(status => {
-    const category = state.categories.find(c=>c.name===status.category);
-    return category && category.deduct;
-  });
-}
-
-function getStrength(squad) {
-  const members = state.cadets.filter(c=>squadOf(c)===squad);
-  const absent = members.filter(c=>cadetDeducts(c)).length;
-  return {
-    total:members.length,
-    current:members.length-absent
+  state.timeline.strengths[selectedSquad] = {
+    current:Number.isFinite(current) ? current : 0,
+    total:Number.isFinite(total) ? total : 0
   };
+
+  saveState();
+  refreshOutput();
 }
 
-function updateStrengthDisplays() {
-  const s = getStrength(selectedSquad);
-  document.getElementById("currentStrength").textContent = s.current;
-  document.getElementById("totalStrength").textContent = s.total;
-
-  const cs = document.getElementById("cadetSquad").value;
-  const c = getStrength(cs);
-  document.getElementById("cadetCurrentStrength").textContent = c.current;
-  document.getElementById("cadetTotalStrength").textContent = c.total;
-}
+/* ------------------------------
+   CADET STATUS DISPLAY
+------------------------------ */
 
 function renderCadets() {
   const squad = document.getElementById("cadetSquad").value;
-  const members = state.cadets.filter(c=>squadOf(c)===squad);
-  const groups = new Map();
-
-  groups.set("PRESENT",members.filter(c=>!c.statuses.length));
-  state.categories.forEach(category => {
-    groups.set(category.name,members.filter(c=>
-      c.statuses.some(s=>s.category===category.name)
-    ));
-  });
+  const members = state.cadets.filter(c=>c.squad===squad);
 
   let html = "";
-  for (const [category,list] of groups) {
-    if (!list.length) continue;
+
+  // Display all cadets with a status first, grouped by category.
+  statusCategories.forEach(category => {
+    const list = members.filter(cadet => {
+      const status = getCadetStatus(cadet);
+      return status && status.category===category;
+    });
+
+    if (!list.length) return;
+
     html += `<div class="cadet-group">
       <div class="cadet-group-title">
-        <span>${escapeHtml(category)}</span><span>${list.length}</span>
+        <span>${escapeHtml(category)}</span>
+        <span>${list.length}</span>
       </div>
       <div class="cadet-grid">`;
+
     list.forEach(cadet => {
-      const statusText = cadet.statuses.map(s=>s.category).join(", ") || "Present";
-      const expired = cadet.statuses.some(s=>s.end && s.end<today());
-      html += `<button class="cadet-tile ${cadetDeducts(cadet)?"absent":"present"}"
+      const status = getCadetStatus(cadet);
+      const details = [];
+
+      if (status.start || status.end) {
+        details.push(
+          `${formatStatusDate(status.start)}${status.end?" - "+formatStatusDate(status.end):""}`
+        );
+      }
+      if (status.reason) details.push(status.reason);
+
+      html += `<button class="cadet-tile absent"
         onclick="openCadetModal('${cadet.id}')">
         <strong>${escapeHtml(cadet.name)}</strong>
-        <small>${escapeHtml(statusText)}${expired?" · Check expired date":""}</small>
+        <small>${escapeHtml(details.join(" · ") || category)}</small>
       </button>`;
     });
+
+    html += `</div></div>`;
+  });
+
+  // Present cadets are always displayed last.
+  const present = members.filter(cadet => !getCadetStatus(cadet));
+
+  if (present.length) {
+    html += `<div class="cadet-group">
+      <div class="cadet-group-title">
+        <span>PRESENT</span>
+        <span>${present.length}</span>
+      </div>
+      <div class="cadet-grid">`;
+
+    present.forEach(cadet => {
+      html += `<button class="cadet-tile present"
+        onclick="openCadetModal('${cadet.id}')">
+        <strong>${escapeHtml(cadet.name)}</strong>
+        <small>Present</small>
+      </button>`;
+    });
+
     html += `</div></div>`;
   }
 
-  document.getElementById("cadetGroups").innerHTML = html || "<p class='muted'>No cadets found.</p>";
-  renderCategorySettings();
-  updateStrengthDisplays();
-}
-
-function renderCategorySettings() {
-  const container = document.getElementById("categorySettings");
-  container.innerHTML = state.categories.map((category,index)=>`
-    <div class="category-row">
-      <span>${escapeHtml(category.name)}</span>
-      <label style="margin:0;display:flex;align-items:center;gap:5px">
-        <input type="checkbox" ${category.deduct?"checked":""}
-          onchange="changeCategoryDeduction(${index},this.checked)">
-        Deduct strength
-      </label>
-      <button class="red" style="min-height:30px;padding:5px 8px"
-        onclick="deleteCategory(${index})">Delete</button>
-    </div>
-  `).join("");
-}
-
-function changeCategoryDeduction(index,value) {
-  state.categories[index].deduct = value;
-  saveState();
-  renderCadets();
-  refreshOutput();
-}
-
-function addCategory() {
-  const input = document.getElementById("newCategory");
-  const name = input.value.trim();
-  if (!name) return alert("Enter a category name.");
-  if (state.categories.some(c=>c.name.toLowerCase()===name.toLowerCase())) {
-    return alert("That category already exists.");
-  }
-  state.categories.push({name,deduct:false});
-  input.value = "";
-  saveState();
-  renderCadets();
-}
-
-function deleteCategory(index) {
-  const category = state.categories[index];
-  if (!confirm(`Delete the category "${category.name}"? Existing statuses under it will also be removed.`)) return;
-  state.cadets.forEach(c=>c.statuses=c.statuses.filter(s=>s.category!==category.name));
-  state.categories.splice(index,1);
-  saveState();
-  renderCadets();
-  refreshOutput();
+  document.getElementById("cadetGroups").innerHTML =
+    html || "<p class='muted'>No cadets found.</p>";
 }
 
 /* ------------------------------
-   CADET EDITOR
+   CADET STATUS EDITOR
 ------------------------------ */
 
 function openCadetModal(id) {
   editingCadet = state.cadets.find(c=>c.id===id);
   if (!editingCadet) return;
 
+  const status = getCadetStatus(editingCadet);
+
   document.getElementById("editingCadetId").value = id;
-  document.getElementById("editCadetName").value = editingCadet.name;
-  document.getElementById("editCadetSquad").value = editingCadet.squad;
+  document.getElementById("editCadetTitle").textContent =
+    editingCadet.name + " – Status";
 
-  const attachment = editingCadet.attachment || {};
-  document.getElementById("attachmentSquad").value = attachment.squad || "";
-  document.getElementById("attachmentStart").value = attachment.start || "";
-  document.getElementById("attachmentEnd").value = attachment.end || "";
+  const select = document.getElementById("editStatusCategory");
+  select.innerHTML =
+    `<option value="">Select a status</option>` +
+    statusCategories.map(category =>
+      `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`
+    ).join("");
 
-  document.getElementById("newStatusStart").value = today();
-  document.getElementById("newStatusEnd").value = "";
-  document.getElementById("newStatusReason").value = "";
+  select.value = status ? status.category : "";
+  document.getElementById("editStatusStart").value =
+    status ? status.start || "" : today();
+  document.getElementById("editStatusEnd").value =
+    status ? status.end || "" : "";
+  document.getElementById("editStatusReason").value =
+    status ? status.reason || "" : "";
 
-  renderStatusCategoryOptions();
-  renderCadetStatusList();
+  document.getElementById("clearStatusButton").classList.toggle("hidden",!status);
+
+  toggleOtherReason();
   document.getElementById("cadetModal").classList.remove("hidden");
 }
 
@@ -748,98 +681,52 @@ function closeCadetModal() {
   editingCadet = null;
 }
 
-function renderStatusCategoryOptions() {
-  const select = document.getElementById("newStatusCategory");
-  select.innerHTML = state.categories.map(c=>
-    `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`
-  ).join("");
+function toggleOtherReason() {
+  const category = document.getElementById("editStatusCategory").value;
+  const reasonField = document.getElementById("statusReasonField");
+
+  // Remarks are particularly useful for the Others category.
+  reasonField.classList.toggle("hidden",category!=="Others");
 }
 
-function renderCadetStatusList() {
-  const container = document.getElementById("cadetStatusList");
+function saveCadetStatus() {
   if (!editingCadet) return;
 
-  if (!editingCadet.statuses.length) {
-    container.innerHTML = "<p class='muted'>No statuses recorded.</p>";
-    return;
+  const category = document.getElementById("editStatusCategory").value;
+  const start = document.getElementById("editStatusStart").value;
+  const end = document.getElementById("editStatusEnd").value;
+  const reason = document.getElementById("editStatusReason").value.trim();
+
+  if (!category) return alert("Select a status category.");
+  if (end && start && end<start) {
+    return alert("End date cannot be before start date.");
+  }
+  if (category==="Others" && !reason) {
+    return alert("Enter a reason or remark for Others.");
   }
 
-  container.innerHTML = editingCadet.statuses.map((status,index)=>{
-    const dateText = status.start || status.end
-      ? `${formatStatusDate(status.start)}${status.end?" - "+formatStatusDate(status.end):" - Further notice"}`
-      : "No dates";
-    const expired = status.end && status.end<today();
-    return `<div class="status-item">
-      <strong>${escapeHtml(status.category)}</strong>
-      <div>${escapeHtml(dateText)}</div>
-      <div>${escapeHtml(status.reason || "")}</div>
-      ${expired?"<div style='color:#c0392b;font-weight:bold'>End date passed – verify status</div>":""}
-      <button class="red" style="margin-top:6px" onclick="removeCadetStatus(${index})">Remove</button>
-    </div>`;
-  }).join("");
-}
-
-function saveCadetDetails() {
-  if (!editingCadet) return;
-  const name = document.getElementById("editCadetName").value.trim();
-  if (!name) return alert("Enter the cadet's name.");
-
-  editingCadet.name = name;
-  editingCadet.squad = document.getElementById("editCadetSquad").value;
-
-  const attachmentSquad = document.getElementById("attachmentSquad").value;
-  const attachmentStart = document.getElementById("attachmentStart").value;
-  const attachmentEnd = document.getElementById("attachmentEnd").value;
-
-  if (attachmentSquad) {
-    if (attachmentSquad===editingCadet.squad) {
-      return alert("The temporary squad must be different from the permanent squad.");
-    }
-    if (!attachmentStart) return alert("Enter the attachment start date.");
-    if (attachmentEnd && attachmentEnd<attachmentStart) {
-      return alert("Attachment end date cannot be before its start date.");
-    }
-    editingCadet.attachment = {
-      squad:attachmentSquad,start:attachmentStart,end:attachmentEnd
-    };
-  } else {
-    editingCadet.attachment = null;
-  }
+  // Replace any previous status. A cadet can only have one.
+  editingCadet.statuses = [{
+    category,
+    start,
+    end,
+    reason
+  }];
 
   saveState();
+  closeCadetModal();
   renderCadets();
-  updateStrengthDisplays();
-  refreshOutput();
-  alert("Cadet details saved.");
-}
-
-function addCadetStatus() {
-  if (!editingCadet) return;
-  const category = document.getElementById("newStatusCategory").value;
-  const reason = document.getElementById("newStatusReason").value.trim();
-  const start = document.getElementById("newStatusStart").value;
-  const end = document.getElementById("newStatusEnd").value;
-
-  if (!category) return alert("Select a category.");
-  if (end && start && end<start) return alert("End date cannot be before start date.");
-
-  editingCadet.statuses.push({category,reason,start,end});
-  document.getElementById("newStatusReason").value = "";
-  document.getElementById("newStatusEnd").value = "";
-  renderCadetStatusList();
-  saveState();
-  renderCadets();
-  updateStrengthDisplays();
   refreshOutput();
 }
 
-function removeCadetStatus(index) {
+function clearCadetStatus() {
   if (!editingCadet) return;
-  editingCadet.statuses.splice(index,1);
-  renderCadetStatusList();
+
+  editingCadet.statuses = [];
+
   saveState();
+  closeCadetModal();
   renderCadets();
-  updateStrengthDisplays();
   refreshOutput();
 }
 
@@ -848,26 +735,28 @@ function removeCadetStatus(index) {
 ------------------------------ */
 
 function getCadetSitrepLines(squad,categoryName) {
-  const members = state.cadets.filter(c=>squadOf(c)===squad);
+  const members = state.cadets.filter(c=>c.squad===squad);
   const matching = [];
 
-  members.forEach(cadet=>{
-    cadet.statuses.forEach(status=>{
-      if (status.category!==categoryName) return;
+  members.forEach(cadet => {
+    const status = getCadetStatus(cadet);
+    if (!status || status.category!==categoryName) return;
 
-      let detail = "";
-      if (status.start || status.end) {
-        if (categoryName==="LD") {
-          detail = ` (LD: ${formatStatusDate(status.start)} - ${status.end?formatStatusDate(status.end):"Further notice"})`;
-        } else {
-          detail = ` (${formatStatusDate(status.start)}${status.end?" - "+formatStatusDate(status.end):""})`;
-        }
+    let detail = "";
+
+    if (status.start || status.end) {
+      if (categoryName==="LD") {
+        detail += ` (LD: ${formatStatusDate(status.start)} - ${status.end?formatStatusDate(status.end):"Further notice"})`;
+      } else {
+        detail += ` (${formatStatusDate(status.start)}${status.end?" - "+formatStatusDate(status.end):""})`;
       }
-      if (status.reason) {
-        detail = ` (${status.reason})`;
-      }
-      matching.push(`${cadet.name}${detail}`);
-    });
+    }
+
+    if (status.reason) {
+      detail += ` (${status.reason})`;
+    }
+
+    matching.push(`${cadet.name}${detail}`);
   });
 
   return matching;
@@ -875,7 +764,7 @@ function getCadetSitrepLines(squad,categoryName) {
 
 function buildSitrep() {
   const squad = selectedSquad;
-  const strength = getStrength(squad);
+  const strength = state.timeline.strengths[squad] || {current:24,total:24};
   const date = document.getElementById("sitrepDate").value || today();
 
   let output = `${getGreetingText()}
@@ -886,10 +775,18 @@ Current Strength - ${strength.current}
 
 `;
 
-  state.categories.forEach(category=>{
-    const people = getCadetSitrepLines(squad,category.name);
-    output += `*${category.name} - ${people.length}*\n`;
-    if (people.length) output += people.join("\n")+"\n";
+  statusCategories.forEach(category => {
+    const people = getCadetSitrepLines(squad,category);
+
+    // Others is only included when at least one cadet has that status.
+    if (category==="Others" && people.length===0) return;
+
+    output += `*${category} - ${people.length}*\n`;
+
+    if (people.length) {
+      output += people.join("\n")+"\n";
+    }
+
     output += "\n";
   });
 
@@ -899,7 +796,8 @@ Current Strength - ${strength.current}
 `;
 
   const entries = state.timeline.entries || [];
-  entries.forEach(entry=>{
+
+  entries.forEach(entry => {
     output += `${formatTime(entry.time)} - ${entry.text}\n`;
   });
 
@@ -909,6 +807,7 @@ Current Strength - ${strength.current}
 function refreshOutput() {
   const output = document.getElementById("sitrepOutput");
   if (!output) return;
+
   output.value = buildSitrep();
   state.timeline.output = output.value;
   saveState();
@@ -922,7 +821,7 @@ function renderInitialLocations() {
   const container = document.getElementById("initialLocations");
   const isNextMovement = state.timeline.started;
 
-  container.innerHTML = locations.map(location=>{
+  container.innerHTML = locations.map(location => {
     let selectedClass = "";
     let disabled = false;
 
@@ -968,14 +867,18 @@ function updateInitialRoute() {
 
   if (state.timeline.started) {
     if (selectedEndLocation) {
-      box.textContent = `${expandedLocation(state.timeline.currentLocation)} → ${expandedLocation(selectedEndLocation)}`;
+      box.textContent =
+        `${expandedLocation(state.timeline.currentLocation)} → ${expandedLocation(selectedEndLocation)}`;
     } else {
-      box.textContent = `Current location: ${expandedLocation(state.timeline.currentLocation)}. Select the next destination.`;
+      box.textContent =
+        `Current location: ${expandedLocation(state.timeline.currentLocation)}. Select the next destination.`;
     }
   } else if (selectedStartLocation && selectedEndLocation) {
-    box.textContent = `${expandedLocation(selectedStartLocation)} → ${expandedLocation(selectedEndLocation)}`;
+    box.textContent =
+      `${expandedLocation(selectedStartLocation)} → ${expandedLocation(selectedEndLocation)}`;
   } else if (selectedStartLocation) {
-    box.textContent = `Starting location: ${expandedLocation(selectedStartLocation)}. Select a destination.`;
+    box.textContent =
+      `Starting location: ${expandedLocation(selectedStartLocation)}. Select a destination.`;
   } else {
     box.textContent = "Select a starting location.";
   }
@@ -1004,7 +907,10 @@ function generateInitial() {
 
   const time = document.getElementById("initialTime").value;
   const date = document.getElementById("initialDate").value;
-  if (!time || !date) return alert("Enter the movement time and date.");
+
+  if (!time || !date) {
+    return alert("Enter the movement time and date.");
+  }
 
   state.timeline.squad = selectedSquad;
 
@@ -1016,8 +922,9 @@ function generateInitial() {
   state.timeline.destination = endLocation;
 
   state.timeline.entries.push({
-    date,time,
-    text:`${selectedSquad} leaving ${timelineLocation(startLocation)} for ${timelineLocation(endLocation)}`
+    date,
+    time,
+    text:`${selectedSquad} left ${timelineLocation(startLocation)} for ${timelineLocation(endLocation)}`
   });
 
   state.timeline.started = true;
@@ -1056,14 +963,12 @@ function generateArrived() {
   }
 
   const arrivedLocation = state.timeline.destination;
-  const time = currentTime();
-  const date = today();
 
-  // Update the last confirmed location only when Arrived is selected.
   state.timeline.currentLocation = arrivedLocation;
 
   state.timeline.entries.push({
-    date,time,
+    date:today(),
+    time:currentTime(),
     text:`${selectedSquad} arrived at ${timelineLocation(arrivedLocation)}`
   });
 
@@ -1119,8 +1024,9 @@ function showDiversionOptions() {
 function renderNextLocations() {
   const container = document.getElementById("nextLocations");
 
-  container.innerHTML = locations.map(location=>{
+  container.innerHTML = locations.map(location => {
     const selected = location===selectedNextLocation ? "selected-end" : "";
+
     return `<button class="location-btn ${selected}"
       onclick="selectNextLocation('${location}')">${escapeHtml(location)}</button>`;
   }).join("");
@@ -1134,6 +1040,7 @@ function selectNextLocation(location) {
 
 function updateNextRoute() {
   const box = document.getElementById("nextRoute");
+
   box.textContent = selectedNextLocation
     ? `${expandedLocation(state.timeline.destination)} → ${expandedLocation(selectedNextLocation)}`
     : "Select the new destination.";
@@ -1141,12 +1048,15 @@ function updateNextRoute() {
 
 function cancelDiversion() {
   selectedNextLocation = "";
+
   document.getElementById("diversionSelection").classList.add("hidden");
   document.getElementById("movementChoices").classList.remove("hidden");
 }
 
 function generateDiverted() {
-  if (!selectedNextLocation) return alert("Select the diversion destination.");
+  if (!selectedNextLocation) {
+    return alert("Select the diversion destination.");
+  }
 
   if (selectedNextLocation===state.timeline.destination) {
     return alert("Select a different diversion destination.");
@@ -1154,17 +1064,20 @@ function generateDiverted() {
 
   const time = document.getElementById("updateTime").value;
   const date = document.getElementById("updateDate").value;
-  if (!time || !date) return alert("Enter the update time and date.");
+
+  if (!time || !date) {
+    return alert("Enter the update time and date.");
+  }
 
   const previousDestination = state.timeline.destination;
 
   state.timeline.entries.push({
-    date,time,
+    date,
+    time,
     text:`${selectedSquad} diverted from ${timelineLocation(previousDestination)} to ${timelineLocation(selectedNextLocation)}`
   });
 
-  // Keep currentLocation as the last confirmed arrival.
-  // The new destination becomes the location the squad is heading towards.
+  // Keep the last confirmed location unchanged until Arrived is selected.
   state.timeline.destination = selectedNextLocation;
   state.timeline.stage = "diverted-review";
   selectedNextLocation = "";
@@ -1190,7 +1103,7 @@ function renderTimelineEntries() {
   const container = document.getElementById("timelineEntries");
   const entries = state.timeline.entries || [];
 
-  container.innerHTML = entries.map(entry=>`
+  container.innerHTML = entries.map(entry => `
     <div class="timeline-entry">
       <strong>${formatTime(entry.time)}</strong> - ${escapeHtml(entry.text)}
     </div>
@@ -1203,6 +1116,7 @@ function renderTimelineEntries() {
 
 async function shareSitrep() {
   const text = document.getElementById("sitrepOutput").value;
+
   if (!text.trim()) return alert("Generate a SITREP first.");
 
   const button = document.getElementById("shareButton");
@@ -1213,27 +1127,24 @@ async function shareSitrep() {
 
   try {
     if (navigator.share) {
-      // Wait until the native sharing sheet closes.
       await navigator.share({
         title:"OCT SITREP",
         text
       });
 
-      // Reaching this point means the share action was completed
-      // rather than cancelled.
+      // Only advance after the native share action completes.
       completeShareWorkflow();
 
     } else {
-      // If native sharing is unavailable, use clipboard as the fallback.
       const copied = await copySitrep(false);
+
       if (copied) {
         completeShareWorkflow();
       }
     }
   } catch (error) {
     if (error.name==="AbortError") {
-      // The user cancelled the sharing sheet.
-      // Keep the current page and SITREP available.
+      // Sharing was cancelled. Keep the user on the review page.
       return;
     }
 
@@ -1248,13 +1159,11 @@ function completeShareWorkflow() {
   const stage = state.timeline.stage;
 
   if (stage==="arrived-review") {
-    // After sharing an arrival SITREP, return to location selection.
     showNextMovementSelection();
     return;
   }
 
   if (stage==="review" || stage==="diverted-review") {
-    // After sharing a movement or diversion SITREP, show next actions.
     state.timeline.stage = "choices";
 
     document.getElementById("initialMovementCard").classList.add("hidden");
@@ -1276,8 +1185,10 @@ async function copySitrep(showMessage=true) {
 
   try {
     await navigator.clipboard.writeText(text);
+
     if (showMessage) alert("SITREP copied.");
     return true;
+
   } catch (error) {
     const output = document.getElementById("sitrepOutput");
     output.select();
@@ -1297,7 +1208,9 @@ async function copySitrep(showMessage=true) {
 ------------------------------ */
 
 function resetMovement() {
-  if (!confirm("Reset the current movement timeline? Cadet statuses will not be deleted.")) return;
+  if (!confirm("Reset the current movement timeline? Cadet statuses and manual strength figures will not be deleted.")) {
+    return;
+  }
 
   state.timeline.started = false;
   state.timeline.stage = "initial";
@@ -1345,7 +1258,10 @@ function restoreTimeline() {
   document.getElementById("initialTime").value = currentTime();
 
   document.getElementById("greeting").value =
-    t.greeting || `${timeGreeting()} sirs. I am OCT ${t.icName || "(IC Name)"} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`;
+    t.greeting ||
+    `${timeGreeting()} sirs. I am OCT ${t.icName || "(IC Name)"} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`;
+
+  loadManualStrength();
 
   if (t.started) {
     document.getElementById("accumulatedCard").classList.remove("hidden");
@@ -1363,7 +1279,6 @@ function restoreTimeline() {
       t.destination ? `Destination: ${expandedLocation(t.destination)}` : "";
 
     if (t.stage==="next-location") {
-      // Restore the next-location selector after a page reload.
       document.getElementById("initialMovementCard").classList.remove("hidden");
       document.getElementById("ongoingMovementCard").classList.add("hidden");
 
@@ -1373,9 +1288,6 @@ function restoreTimeline() {
       document.getElementById("initialMovementHeading").textContent = "Next Movement";
       document.getElementById("initialMovementInstructions").textContent =
         "Your last confirmed location is shown in green. Select your next destination in red.";
-
-      renderInitialLocations();
-      updateInitialRoute();
 
     } else {
       document.getElementById("initialMovementCard").classList.add("hidden");
@@ -1406,7 +1318,6 @@ function restoreTimeline() {
 function initialise() {
   document.getElementById("cadetSquad").value = selectedSquad;
   restoreTimeline();
-  updateStrengthDisplays();
   renderCadets();
 }
 
