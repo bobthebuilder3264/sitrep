@@ -161,10 +161,6 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
           <label>SITREP Date</label>
           <input id="sitrepDate" type="date" onchange="refreshOutput()">
         </div>
-        <div class="field">
-          <label>SITREP Time</label>
-          <input id="sitrepTime" type="time" onchange="refreshOutput()">
-        </div>
       </div>
     </div>
 
@@ -287,6 +283,11 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
     </div>
 
     <div class="field" style="margin-top:10px">
+      <label>Remarks (optional)</label>
+      <input id="editStatusReason" placeholder="Enter reason or remarks">
+    </div>
+
+    <div class="field" style="margin-top:10px">
       <label>Start Date</label>
       <input id="editStatusStart" type="date">
     </div>
@@ -294,11 +295,6 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
     <div class="field" style="margin-top:10px">
       <label>End Date</label>
       <input id="editStatusEnd" type="date">
-    </div>
-
-    <div class="field" style="margin-top:10px" id="statusReasonField">
-      <label>Reason / Remarks (optional)</label>
-      <input id="editStatusReason" placeholder="e.g. Experiencing cough-like symptoms">
     </div>
 
     <div class="row" style="margin-top:16px">
@@ -534,7 +530,7 @@ function selectSquad() {
 
 function updateGreetingFromIC() {
   const name = document.getElementById("icName").value.trim();
-  const greeting = `${timeGreeting()} sirs. I am OCT ${name || "(IC Name)"} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`;
+  const greeting = `${timeGreeting()} sirs. I am OCT ${name || "(IC Name)"} from ${selectedSquad}.\nHere is the Sitrep for ${selectedSquad}.`;
 
   document.getElementById("greeting").value = greeting;
   state.timeline.icName = name;
@@ -682,11 +678,8 @@ function closeCadetModal() {
 }
 
 function toggleOtherReason() {
-  const category = document.getElementById("editStatusCategory").value;
-  const reasonField = document.getElementById("statusReasonField");
-
-  // Remarks are particularly useful for the Others category.
-  reasonField.classList.toggle("hidden",category!=="Others");
+  // Remarks are available for every status category.
+  document.getElementById("statusReasonField").classList.remove("hidden");
 }
 
 function saveCadetStatus() {
@@ -700,9 +693,6 @@ function saveCadetStatus() {
   if (!category) return alert("Select a status category.");
   if (end && start && end<start) {
     return alert("End date cannot be before start date.");
-  }
-  if (category==="Others" && !reason) {
-    return alert("Enter a reason or remark for Others.");
   }
 
   // Replace any previous status. A cadet can only have one.
@@ -1253,13 +1243,12 @@ function restoreTimeline() {
   document.getElementById("icName").value = t.icName || "";
 
   document.getElementById("sitrepDate").value = today();
-  document.getElementById("sitrepTime").value = currentTime();
   document.getElementById("initialDate").value = today();
   document.getElementById("initialTime").value = currentTime();
 
   document.getElementById("greeting").value =
     t.greeting ||
-    `${timeGreeting()} sirs. I am OCT ${t.icName || "(IC Name)"} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`;
+    `${timeGreeting()} sirs. I am OCT ${t.icName || "(IC Name)"} from ${selectedSquad}.\nHere is the Sitrep for ${selectedSquad}.`;
 
   loadManualStrength();
 
