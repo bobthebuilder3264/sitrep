@@ -1,2071 +1,1230 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OCT SITREP</title>
-
 <style>
 :root {
-    --bg: #f3f5f8;
-    --card: #ffffff;
-    --text: #182230;
-    --muted: #687586;
-    --border: #e1e6ed;
-    --primary: #2457d6;
-    --primary-light: #eaf0ff;
-    --green: #16834a;
-    --green-light: #e7f6ed;
-    --red: #c43d3d;
-    --red-light: #fff0f0;
-    --orange: #b66a13;
-    --orange-light: #fff5e8;
-    --shadow: 0 3px 12px rgba(20, 35, 60, .06);
+  --bg:#f3f6fa; --card:#fff; --text:#172333; --muted:#687789;
+  --blue:#1769aa; --blue2:#e8f2fc; --green:#198754;
+  --red:#c0392b; --orange:#d97706; --border:#dce3eb;
 }
-
-* {
-    box-sizing: border-box;
-}
-
+* { box-sizing:border-box; }
 body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                 Roboto, Arial, sans-serif;
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
 }
-
-button, input, textarea, select {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-}
-
 header {
-    background: #14233c;
-    color: white;
-    padding: 17px 20px;
+  background:#123b5d; color:white; padding:18px 16px;
 }
-
-.header-inner {
-    max-width: 1050px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+header h1 { margin:0; font-size:21px; }
+header p { margin:5px 0 0; font-size:12px; opacity:.85; }
+main { max-width:1000px; margin:auto; padding:14px; }
+nav { display:flex; gap:8px; margin-bottom:14px; }
+nav button { flex:1; }
+button {
+  border:0; border-radius:9px; padding:11px 13px;
+  font-weight:700; cursor:pointer; min-height:42px;
 }
-
-header h1 {
-    font-size: 20px;
-    margin: 0;
-}
-
-header small {
-    color: #bdc9dc;
-}
-
-nav {
-    max-width: 1050px;
-    margin: 18px auto 0;
-    padding: 0 15px;
-    display: flex;
-    gap: 8px;
-}
-
-.nav-btn {
-    border: 0;
-    padding: 11px 18px;
-    border-radius: 10px;
-    background: #e4e9f1;
-    color: #435064;
-    font-weight: 700;
-}
-
-.nav-btn.active {
-    background: var(--primary);
-    color: white;
-}
-
-main {
-    max-width: 1050px;
-    margin: 18px auto;
-    padding: 0 15px 40px;
-}
-
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
+button:disabled { opacity:.45; cursor:not-allowed; }
+.primary { background:var(--blue); color:white; }
+.secondary { background:#e5ebf1; color:#24384b; }
+.green { background:var(--green); color:white; }
+.orange { background:var(--orange); color:white; }
+.red { background:var(--red); color:white; }
+.active-tab { background:var(--blue); color:white; }
+.full { width:100%; }
 .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 17px;
-    margin-bottom: 14px;
-    box-shadow: var(--shadow);
+  background:var(--card); border:1px solid var(--border);
+  border-radius:13px; padding:15px; margin-bottom:13px;
+  box-shadow:0 2px 7px #162c4010;
 }
-
-.card h2 {
-    margin: 0 0 14px;
-    font-size: 17px;
-}
-
-.card h3 {
-    font-size: 14px;
-    margin: 17px 0 9px;
-}
-
+h2 { font-size:17px; margin:0 0 13px; }
+h3 { font-size:14px; margin:14px 0 8px; }
 label {
-    display: block;
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 6px;
+  display:block; font-size:12px; color:var(--muted);
+  font-weight:700; margin-bottom:5px;
 }
-
-input, textarea, select {
-    width: 100%;
-    padding: 11px 12px;
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    background: white;
-    color: var(--text);
-    outline: none;
+input,select,textarea {
+  width:100%; padding:10px; border:1px solid var(--border);
+  border-radius:8px; background:white; color:var(--text);
+  font:inherit; font-size:14px;
 }
-
-input:focus, textarea:focus, select:focus {
-    border-color: var(--primary);
-}
-
-textarea {
-    resize: vertical;
-    min-height: 75px;
-}
-
-.field {
-    margin-bottom: 13px;
-}
-
-.row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.row.three {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.btn {
-    border: 0;
-    border-radius: 9px;
-    padding: 11px 15px;
-    font-weight: 700;
-    background: #e9edf4;
-    color: #273449;
-}
-
-.btn.primary {
-    background: var(--primary);
-    color: white;
-}
-
-.btn.green {
-    background: var(--green);
-    color: white;
-}
-
-.btn.red {
-    background: var(--red);
-    color: white;
-}
-
-.btn.orange {
-    background: var(--orange);
-    color: white;
-}
-
-.btn.small {
-    padding: 7px 10px;
-    font-size: 12px;
-}
-
-.btn.full {
-    width: 100%;
-}
-
-.btn:disabled {
-    opacity: .45;
-    cursor: not-allowed;
-}
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 14px;
-}
-
-.stat {
-    background: #f5f7fa;
-    border: 1px solid var(--border);
-    border-radius: 11px;
-    padding: 13px;
-}
-
-.stat strong {
-    display: block;
-    font-size: 25px;
-    margin-top: 3px;
-}
-
-.stat span {
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.squad-switch {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-}
-
-.squad-switch button {
-    flex: 1;
-}
-
-.squad-switch button.active {
-    background: var(--primary);
-    color: white;
-}
-
-.location-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-}
-
+textarea { min-height:240px; resize:vertical; line-height:1.5; }
+.field { flex:1; min-width:130px; }
+.row { display:flex; gap:10px; flex-wrap:wrap; align-items:end; }
+.grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.location-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
 .location-btn {
-    border: 1px solid var(--border);
-    background: white;
-    border-radius: 9px;
-    padding: 11px 5px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #39475b;
+  background:#edf2f7; color:#25394d; border:2px solid transparent;
+  min-height:46px;
 }
-
-.location-btn.start {
-    border: 2px solid var(--green);
-    background: var(--green-light);
-    color: var(--green);
-}
-
-.location-btn.destination {
-    border: 2px solid var(--red);
-    background: var(--red-light);
-    color: var(--red);
-}
-
-.location-btn.current {
-    border: 2px solid var(--green);
-    background: var(--green-light);
-    color: var(--green);
-}
-
-.location-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 13px;
-    margin-top: 12px;
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.dot {
-    display: inline-block;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    margin-right: 5px;
-}
-
-.dot.green {
-    background: var(--green);
-}
-
-.dot.red {
-    background: var(--red);
-}
-
+.location-btn.selected-start { background:#e1f5e9; border-color:var(--green); }
+.location-btn.selected-end { background:#fde8e7; border-color:var(--red); }
 .route-box {
-    padding: 12px;
-    background: #f5f7fa;
-    border-radius: 9px;
-    margin-top: 12px;
-    font-weight: 700;
-    text-align: center;
+  background:#f0f5fa; border-radius:8px; padding:11px;
+  margin-top:10px; font-size:13px; font-weight:700;
 }
-
+.muted { color:var(--muted); font-size:12px; line-height:1.5; }
+.hidden { display:none !important; }
+.stats { display:flex; gap:8px; margin-bottom:12px; }
+.stat {
+  flex:1; background:#f1f5f9; border-radius:8px;
+  padding:6px 9px; min-width:0;
+}
+.stat-label { color:var(--muted); font-size:10px; }
+.stat-value { font-size:16px; font-weight:800; margin-top:2px; }
 .movement-status {
-    padding: 12px;
-    background: var(--primary-light);
-    border-radius: 9px;
-    margin-bottom: 13px;
+  background:#f0f5fa; border-radius:8px; padding:10px;
+  font-size:13px; margin-bottom:12px;
 }
-
-.movement-status strong {
-    color: var(--primary);
-}
-
 .timeline-entry {
-    border-left: 3px solid var(--primary);
-    padding: 8px 12px;
-    margin: 9px 0;
-    background: #f7f9fc;
-    border-radius: 0 8px 8px 0;
-    font-size: 13px;
+  border-left:3px solid var(--blue); padding:5px 0 5px 10px;
+  margin:8px 0; font-size:13px;
 }
-
-.timeline-entry small {
-    display: block;
-    color: var(--muted);
-    margin-bottom: 4px;
+.cadet-group { margin-bottom:17px; }
+.cadet-group-title {
+  font-size:13px; font-weight:800; margin-bottom:8px;
+  display:flex; justify-content:space-between;
 }
-
-.output {
-    min-height: 230px;
-    font-family: monospace;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.cadet-groups {
-    display: grid;
-    gap: 14px;
-}
-
-.group-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 800;
-    font-size: 14px;
-    margin-bottom: 8px;
-}
-
-.group-heading span {
-    color: var(--muted);
-    font-size: 12px;
-}
-
 .cadet-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px;
 }
-
 .cadet-tile {
-    min-height: 76px;
-    border: 1px solid var(--border);
-    background: white;
-    border-radius: 10px;
-    padding: 9px 5px;
-    text-align: center;
-    overflow-wrap: anywhere;
+  min-height:65px; background:#f5f7fa; border:1px solid var(--border);
+  text-align:left; padding:9px; border-radius:9px;
 }
-
-.cadet-tile strong {
-    display: block;
-    font-size: 12px;
-}
-
+.cadet-tile strong { display:block; font-size:12px; }
 .cadet-tile small {
-    display: block;
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 5px;
+  display:block; font-size:10px; color:var(--muted); margin-top:5px;
 }
-
-.cadet-tile.absent {
-    background: var(--red-light);
-    border-color: #f0caca;
-}
-
-.cadet-tile.present {
-    background: var(--green-light);
-    border-color: #c9e8d5;
-}
-
-.cadet-tile.other {
-    background: var(--orange-light);
-    border-color: #f0dfc7;
-}
-
-.status-item {
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 10px;
-    margin: 8px 0;
-    font-size: 13px;
-}
-
-.status-item .status-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    align-items: center;
-}
-
-.status-item small {
-    color: var(--muted);
-    display: block;
-    margin-top: 5px;
-}
-
-.inline-check {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    margin: 8px 0;
-}
-
-.inline-check input {
-    width: auto;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid var(--border);
-    margin: 17px 0;
-}
-
-.muted {
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.modal-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 20, 35, .55);
-    z-index: 10;
-    padding: 15px;
-    overflow-y: auto;
-}
-
-.modal-backdrop.show {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-}
-
-.modal {
-    background: white;
-    width: 100%;
-    max-width: 570px;
-    border-radius: 15px;
-    padding: 18px;
-    margin: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 18px;
-}
-
+.cadet-tile.absent { background:#fff2e8; border-color:#f1c99e; }
+.cadet-tile.present { background:#eff8f2; border-color:#c4e4ce; }
 .category-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 8px;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
+  display:flex; align-items:center; gap:8px; padding:8px 0;
+  border-bottom:1px solid var(--border); font-size:13px;
 }
-
-.category-row input[type="checkbox"] {
-    width: auto;
+.category-row span { flex:1; }
+.category-row input { width:auto; }
+.modal {
+  position:fixed; inset:0; background:#0008; z-index:10;
+  display:flex; align-items:center; justify-content:center;
+  padding:12px;
 }
-
-@media (max-width: 600px) {
-    .row, .row.three {
-        grid-template-columns: 1fr;
-    }
-
-    .location-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .cadet-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .card {
-        padding: 14px;
-    }
+.modal-content {
+  width:min(560px,100%); max-height:92vh; overflow:auto;
+  background:white; border-radius:13px; padding:17px;
+}
+.status-item {
+  border:1px solid var(--border); border-radius:8px;
+  padding:9px; margin:7px 0; font-size:12px;
+}
+.status-item button { min-height:32px; padding:6px 9px; }
+hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
+@media(max-width:480px) {
+  main { padding:10px; }
+  .location-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .cadet-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .card { padding:12px; }
 }
 </style>
 </head>
-
 <body>
 
 <header>
-    <div class="header-inner">
-        <div>
-            <h1>OCT SITREP</h1>
-            <small>Squad Movement & Strength Tracker</small>
-        </div>
-        <small id="saveIndicator">Auto-saved</small>
-    </div>
+  <h1>OCT SITREP</h1>
+  <p>Squad movement and cadet status management</p>
 </header>
 
-<nav>
-    <button class="nav-btn active" onclick="showPage('timeline', this)">
-        Timeline
-    </button>
-    <button class="nav-btn" onclick="showPage('cadets', this)">
-        Cadet Status
-    </button>
-</nav>
-
 <main>
+  <nav>
+    <button id="timelineTab" class="active-tab" onclick="showPage('timeline')">Timeline</button>
+    <button id="cadetTab" class="secondary" onclick="showPage('cadets')">Cadet Status</button>
+  </nav>
 
-<!-- ================= TIMELINE PAGE ================= -->
-
-<section id="timelinePage" class="page active">
+  <!-- TIMELINE PAGE -->
+  <section id="timelinePage">
 
     <div class="card">
-        <h2>SITREP Details</h2>
-
-        <div class="squad-switch">
-            <button class="btn active" id="timelineOCT3"
-                onclick="selectSquad('OCT 3')">OCT 3</button>
-            <button class="btn" id="timelineOCT4"
-                onclick="selectSquad('OCT 4')">OCT 4</button>
-        </div>
-
-        <div class="row">
-            <div class="field">
-                <label>IC Name</label>
-                <input id="icName" placeholder="Enter IC name"
-                    oninput="saveState()">
-            </div>
-
-            <div class="field">
-                <label>Date</label>
-                <input id="sitrepDate" type="date"
-                    onchange="saveState()">
-            </div>
-        </div>
-
+      <h2>SITREP Details</h2>
+      <div class="grid">
         <div class="field">
-            <label>Greeting (editable)</label>
-            <textarea id="greeting" rows="2"
-                oninput="saveState()"></textarea>
+          <label>Squad</label>
+          <select id="squad" onchange="selectSquad()">
+            <option>OCT 3</option>
+            <option>OCT 4</option>
+          </select>
         </div>
+        <div class="field">
+          <label>IC Name</label>
+          <input id="icName" placeholder="Enter IC name" oninput="updateGreetingFromIC()">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label>Greeting (editable)</label>
+        <textarea id="greeting" style="min-height:75px" oninput="saveState()"></textarea>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field">
+          <label>Date</label>
+          <input id="sitrepDate" type="date" onchange="refreshOutput()">
+        </div>
+        <div class="field">
+          <label>Time</label>
+          <input id="sitrepTime" type="time" onchange="refreshOutput()">
+        </div>
+      </div>
+    </div>
 
-        <div class="stats">
-            <div class="stat">
-                <span>Current Strength</span>
-                <strong id="currentStrength">24</strong>
-            </div>
-            <div class="stat">
-                <span>Total Strength</span>
-                <strong id="totalStrength">24</strong>
-            </div>
-        </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Current Strength</div>
+        <div class="stat-value" id="currentStrength">24</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Strength</div>
+        <div class="stat-value" id="totalStrength">24</div>
+      </div>
     </div>
 
     <!-- INITIAL MOVEMENT -->
-
     <div class="card" id="initialMovementCard">
-        <h2>Initial Movement</h2>
-
-        <p class="muted">
-            Select the starting location first, followed by the destination.
-        </p>
-
-        <div class="location-grid" id="initialLocations"></div>
-
-        <div class="location-legend">
-            <span><i class="dot green"></i>Starting location</span>
-            <span><i class="dot red"></i>Destination</span>
+      <h2>Initial Movement</h2>
+      <p class="muted">Select the starting location first, followed by the destination.</p>
+      <div class="location-grid" id="initialLocations"></div>
+      <div class="route-box" id="initialRoute">Select a starting location.</div>
+      <div class="row" style="margin-top:12px">
+        <div class="field">
+          <label>Movement Time</label>
+          <input id="initialTime" type="time">
         </div>
-
-        <div class="route-box" id="initialRoute">
-            Select a starting location and destination.
+        <div class="field">
+          <label>Movement Date</label>
+          <input id="initialDate" type="date">
         </div>
-
-        <div class="row" style="margin-top:14px">
-            <div class="field">
-                <label>Movement Time</label>
-                <input id="initialTime" type="time">
-            </div>
-            <div class="field">
-                <label>Movement Date</label>
-                <input id="initialMovementDate" type="date">
-            </div>
-        </div>
-
-        <button class="btn primary full" onclick="generateInitial()">
-            Generate SITREP
-        </button>
+      </div>
+      <button class="primary full" style="margin-top:12px" onclick="generateInitial()">Generate SITREP</button>
     </div>
 
     <!-- ONGOING MOVEMENT -->
-
     <div class="card hidden" id="ongoingMovementCard">
-        <h2>Movement Update</h2>
+      <h2>Movement Update</h2>
+      <div class="movement-status">
+        Current Location:
+        <strong id="currentLocationDisplay">-</strong>
+      </div>
 
-        <div class="movement-status">
-            Current Location:
-            <strong id="currentLocationDisplay">-</strong>
+      <div id="movementChoices" class="hidden">
+        <p class="muted">What happened next?</p>
+        <div class="row">
+          <button class="green full" onclick="generateArrived()">Arrived</button>
+          <button class="orange full" onclick="showDiversionOptions()">Diverted</button>
         </div>
+      </div>
 
-        <div class="field">
-            <label>Update Type</label>
-            <select id="movementAction" onchange="updateMovementAction()">
-                <option value="arrived">Arrived</option>
-                <option value="diverted">Diverted</option>
-            </select>
+      <div id="diversionSelection" class="hidden">
+        <h3>Select Diversion Location</h3>
+        <div class="location-grid" id="nextLocations"></div>
+        <div class="route-box" id="nextRoute">Select the new destination.</div>
+        <div class="row" style="margin-top:12px">
+          <div class="field">
+            <label>Update Time</label>
+            <input id="updateTime" type="time">
+          </div>
+          <div class="field">
+            <label>Update Date</label>
+            <input id="updateDate" type="date">
+          </div>
         </div>
-
-        <div id="nextLocationArea">
-            <label id="nextLocationLabel">Next Location</label>
-            <div class="location-grid" id="nextLocations"></div>
-        </div>
-
-        <div class="route-box" id="nextRoute">
-            Select the next location.
-        </div>
-
-        <div class="row" style="margin-top:14px">
-            <div class="field">
-                <label>Update Time</label>
-                <input id="updateTime" type="time">
-            </div>
-            <div class="field">
-                <label>Update Date</label>
-                <input id="updateDate" type="date">
-            </div>
-        </div>
-
-        <button class="btn primary full" onclick="generateUpdate()">
-            Generate & Share SITREP
-        </button>
+        <button class="primary full" style="margin-top:12px" onclick="generateDiverted()">Generate SITREP</button>
+        <button class="secondary full" style="margin-top:8px" onclick="cancelDiversion()">Cancel</button>
+      </div>
     </div>
-
-    <!-- ACCUMULATED TIMELINE -->
 
     <div class="card hidden" id="accumulatedCard">
-        <h2>Movement Timeline</h2>
-        <div id="timelineEntries"></div>
+      <h2>Movement Timeline</h2>
+      <div id="timelineEntries"></div>
     </div>
-
-    <!-- SITREP OUTPUT -->
 
     <div class="card hidden" id="outputCard">
-        <h2>Generated SITREP</h2>
-
-        <p class="muted">
-            You can edit the SITREP below before sharing it.
-        </p>
-
-        <textarea id="sitrepOutput" class="output"
-            oninput="saveState()"></textarea>
-
-        <div class="row" style="margin-top:12px">
-            <button class="btn primary full" onclick="shareSitrep()">
-                Share SITREP
-            </button>
-            <button class="btn full" onclick="copySitrep()">
-                Copy SITREP
-            </button>
-        </div>
+      <h2>Generated SITREP</h2>
+      <textarea id="sitrepOutput" oninput="saveOutput()"></textarea>
+      <button class="primary full" style="margin-top:10px" onclick="shareSitrep()">Share SITREP</button>
+      <button class="secondary full" style="margin-top:8px" onclick="copySitrep()">Copy SITREP</button>
     </div>
 
     <div class="card">
-        <button class="btn red full" onclick="resetMovement()">
-            Reset Movement / Start New SITREP
-        </button>
-        <p class="muted" style="margin-bottom:0">
-            This clears the current movement timeline but does not remove
-            cadet records or status information.
-        </p>
+      <h2>Reset Movement</h2>
+      <p class="muted">This clears the current movement timeline and allows you to start a new SITREP. It does not delete cadet statuses.</p>
+      <button class="red full" onclick="resetMovement()">Reset Movement</button>
     </div>
+  </section>
 
-</section>
-
-
-<!-- ================= CADET STATUS PAGE ================= -->
-
-<section id="cadetsPage" class="page">
-
+  <!-- CADET STATUS PAGE -->
+  <section id="cadetsPage" class="hidden">
     <div class="card">
-        <h2>Cadet Status</h2>
-
-        <div class="squad-switch">
-            <button class="btn active" id="cadetOCT3"
-                onclick="selectCadetSquad('OCT 3')">OCT 3</button>
-            <button class="btn" id="cadetOCT4"
-                onclick="selectCadetSquad('OCT 4')">OCT 4</button>
+      <h2>Cadet Status</h2>
+      <div class="row">
+        <div class="field">
+          <label>Squad</label>
+          <select id="cadetSquad" onchange="renderCadets()">
+            <option>OCT 3</option>
+            <option>OCT 4</option>
+          </select>
         </div>
-
-        <div class="stats">
-            <div class="stat">
-                <span>Current Strength</span>
-                <strong id="cadetCurrentStrength">24</strong>
-            </div>
-            <div class="stat">
-                <span>Total Strength</span>
-                <strong id="cadetTotalStrength">24</strong>
-            </div>
+      </div>
+      <div class="stats" style="margin-top:12px">
+        <div class="stat">
+          <div class="stat-label">Current Strength</div>
+          <div class="stat-value" id="cadetCurrentStrength">24</div>
         </div>
-
-        <p class="muted">
-            Select a cadet to edit their details, squad, status and
-            temporary attachment.
-        </p>
+        <div class="stat">
+          <div class="stat-label">Total Strength</div>
+          <div class="stat-value" id="cadetTotalStrength">24</div>
+        </div>
+      </div>
+      <p class="muted">Select a cadet to edit their details, statuses or temporary squad attachment.</p>
     </div>
 
     <div class="card">
-        <h2>Cadet Register</h2>
-        <div id="cadetGroups" class="cadet-groups"></div>
+      <h2>Cadets</h2>
+      <div id="cadetGroups"></div>
     </div>
 
     <div class="card">
-        <h2>Category & Strength Settings</h2>
-
-        <p class="muted">
-            Configure which categories appear in the SITREP and whether
-            they deduct from current strength.
-        </p>
-
-        <div id="categorySettings"></div>
-
-        <hr>
-
-        <h3>Add New Category</h3>
-        <div class="row">
-            <div class="field">
-                <label>Category Name</label>
-                <input id="newCategoryName" placeholder="e.g. EMU">
-            </div>
-            <div class="field">
-                <label>Deduct from Current Strength?</label>
-                <select id="newCategoryDeduct">
-                    <option value="false">No</option>
-                    <option value="true">Yes</option>
-                </select>
-            </div>
+      <h2>Category Settings</h2>
+      <p class="muted">Choose which categories reduce current strength. A cadet with multiple deducting statuses is only counted once.</p>
+      <div id="categorySettings"></div>
+      <hr>
+      <div class="row">
+        <div class="field">
+          <label>New Category</label>
+          <input id="newCategory" placeholder="Category name">
         </div>
-
-        <button class="btn primary full" onclick="addCategory()">
-            Add Category
-        </button>
+        <button class="primary" onclick="addCategory()">Add Category</button>
+      </div>
     </div>
-
-</section>
-
+  </section>
 </main>
 
+<!-- CADET EDITOR -->
+<div id="cadetModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Edit Cadet</h2>
+    <input type="hidden" id="editingCadetId">
 
-<!-- ================= CADET EDITOR MODAL ================= -->
-
-<div class="modal-backdrop" id="cadetModal">
-    <div class="modal">
-
-        <div class="modal-header">
-            <h2>Edit Cadet</h2>
-            <button class="btn small" onclick="closeCadetModal()">✕</button>
-        </div>
-
-        <input type="hidden" id="editingCadetId">
-
-        <div class="field">
-            <label>Cadet Name</label>
-            <input id="editCadetName">
-        </div>
-
-        <div class="field">
-            <label>Permanent Squad</label>
-            <select id="editCadetSquad">
-                <option>OCT 3</option>
-                <option>OCT 4</option>
-            </select>
-        </div>
-
-        <hr>
-
-        <h3>Current Statuses</h3>
-        <div id="cadetStatusList"></div>
-
-        <hr>
-
-        <h3>Add Status</h3>
-
-        <div class="field">
-            <label>Category</label>
-            <select id="newStatusCategory"></select>
-        </div>
-
-        <div class="field">
-            <label>Reason / Details</label>
-            <textarea id="newStatusReason"
-                placeholder="Enter reason or additional details"></textarea>
-        </div>
-
-        <div class="row">
-            <div class="field">
-                <label>Start Date</label>
-                <input id="newStatusStart" type="date">
-            </div>
-            <div class="field">
-                <label>End Date</label>
-                <input id="newStatusEnd" type="date">
-            </div>
-        </div>
-
-        <button class="btn primary full" onclick="addCadetStatus()">
-            Add Status
-        </button>
-
-        <hr>
-
-        <h3>Temporary Squad Attachment</h3>
-
-        <div class="field">
-            <label>Attach to Squad</label>
-            <select id="attachmentSquad">
-                <option value="">No temporary attachment</option>
-                <option>OCT 3</option>
-                <option>OCT 4</option>
-            </select>
-        </div>
-
-        <div class="row">
-            <div class="field">
-                <label>Start Date</label>
-                <input id="attachmentStart" type="date">
-            </div>
-            <div class="field">
-                <label>End Date</label>
-                <input id="attachmentEnd" type="date">
-            </div>
-        </div>
-
-        <button class="btn full" onclick="saveAttachment()">
-            Save Attachment
-        </button>
-
-        <hr>
-
-        <button class="btn primary full" onclick="saveCadetDetails()">
-            Save Cadet Details
-        </button>
-
+    <div class="field">
+      <label>Cadet Name</label>
+      <input id="editCadetName">
     </div>
+
+    <div class="field" style="margin-top:10px">
+      <label>Permanent Squad</label>
+      <select id="editCadetSquad">
+        <option>OCT 3</option>
+        <option>OCT 4</option>
+      </select>
+    </div>
+
+    <hr>
+    <h3>Current Statuses</h3>
+    <div id="cadetStatusList"></div>
+
+    <hr>
+    <h3>Add Status</h3>
+    <div class="field">
+      <label>Category</label>
+      <select id="newStatusCategory"></select>
+    </div>
+    <div class="field" style="margin-top:9px">
+      <label>Reason / Remarks (optional)</label>
+      <input id="newStatusReason" placeholder="Enter reason or remarks">
+    </div>
+    <div class="row" style="margin-top:9px">
+      <div class="field">
+        <label>Start Date</label>
+        <input id="newStatusStart" type="date">
+      </div>
+      <div class="field">
+        <label>End Date</label>
+        <input id="newStatusEnd" type="date">
+      </div>
+    </div>
+    <button class="secondary full" style="margin-top:9px" onclick="addCadetStatus()">Add Status</button>
+
+    <hr>
+    <h3>Temporary Squad Attachment</h3>
+    <p class="muted">This changes which squad the cadet is counted under during the attachment period. Their permanent squad remains unchanged.</p>
+    <div class="field">
+      <label>Attach to Squad</label>
+      <select id="attachmentSquad">
+        <option value="">No attachment</option>
+        <option>OCT 3</option>
+        <option>OCT 4</option>
+      </select>
+    </div>
+    <div class="row" style="margin-top:9px">
+      <div class="field">
+        <label>Start Date</label>
+        <input id="attachmentStart" type="date">
+      </div>
+      <div class="field">
+        <label>End Date</label>
+        <input id="attachmentEnd" type="date">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <button class="primary full" onclick="saveCadetDetails()">Save Changes</button>
+      <button class="secondary full" onclick="closeCadetModal()">Close</button>
+    </div>
+  </div>
 </div>
 
-
 <script>
+/* ------------------------------
+   STORAGE AND DEFAULT DATA
+------------------------------ */
 
-/* =====================================================
-   DATA & STORAGE
-===================================================== */
-
-const STORE = "octSitrepSystemV2";
+const STORAGE_KEY = "octSitrepSystemV2";
 
 const defaultCategories = [
-    {name:"MO", deduct:true},
-    {name:"LD", deduct:true},
-    {name:"RMJ", deduct:true},
-    {name:"Fallouts", deduct:true},
-    {name:"MC recovery", deduct:true},
-    {name:"MC", deduct:true},
-    {name:"Gatepass", deduct:true},
-    {name:"Compassionate Leave", deduct:true},
-    {name:"Booking In from MC", deduct:false},
-    {name:"Not Participating", deduct:false},
-    {name:"Booked out", deduct:true},
-    {name:"Scheduled", deduct:false},
-    {name:"Provost", deduct:true},
-    {name:"EMU", deduct:false}
+  {name:"MO",deduct:true},
+  {name:"LD",deduct:true},
+  {name:"RMJ",deduct:true},
+  {name:"Fallouts",deduct:false},
+  {name:"MC recovery",deduct:false},
+  {name:"MC",deduct:true},
+  {name:"Gatepass",deduct:true},
+  {name:"Compassionate Leave",deduct:true},
+  {name:"Booking In from MC",deduct:false},
+  {name:"Not Participating",deduct:false},
+  {name:"Booked out",deduct:true},
+  {name:"Scheduled",deduct:false},
+  {name:"Provost",deduct:false}
 ];
 
-function makeInitialCadets() {
-    const list = [];
-
-    // Each squad starts with 24 cadets.
-    ["OCT 3", "OCT 4"].forEach(squad => {
-        for (let i = 1; i <= 24; i++) {
-            list.push({
-                id: crypto.randomUUID(),
-                name: "Cadet " + i,
-                squad,
-                statuses: [],
-                attachment: null
-            });
-        }
-    });
-
-    return list;
+function makeDefaultCadets() {
+  const list = [];
+  ["OCT 3","OCT 4"].forEach(squad => {
+    for (let i=1;i<=24;i++) {
+      list.push({
+        id:squad.replace(" ","")+"-"+i,
+        name:"Cadet "+i,
+        squad,
+        statuses:[],
+        attachment:null
+      });
+    }
+  });
+  return list;
 }
 
-function defaultState() {
-    return {
-        cadets: makeInitialCadets(),
-        categories: structuredClone(defaultCategories),
-
-        settings: {
-            groupLink: ""
-        },
-
-        timeline: {
-            squad: "OCT 3",
-            icName: "",
-            greeting: "",
-            date: today(),
-            started: false,
-            startLocation: "",
-            currentLocation: "",
-            destination: "",
-            entries: [],
-            output: ""
-        }
-    };
-}
+const defaultState = {
+  cadets:makeDefaultCadets(),
+  categories:defaultCategories,
+  timeline:{
+    squad:"OCT 3",
+    icName:"",
+    greeting:"",
+    started:false,
+    stage:"initial",
+    startLocation:"",
+    currentLocation:"",
+    destination:"",
+    entries:[],
+    output:""
+  }
+};
 
 function loadState() {
-    try {
-        const saved = localStorage.getItem(STORE);
-        if (saved) {
-            const parsed = JSON.parse(saved);
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (!saved) return structuredClone(defaultState);
 
-            if (!parsed.cadets) parsed.cadets = makeInitialCadets();
-            if (!parsed.categories) parsed.categories = structuredClone(defaultCategories);
-            if (!parsed.timeline) parsed.timeline = defaultState().timeline;
+    const result = {...structuredClone(defaultState),...saved};
+    result.timeline = {
+      ...structuredClone(defaultState.timeline),
+      ...(saved.timeline || {})
+    };
+    result.categories = saved.categories || structuredClone(defaultCategories);
+    result.cadets = saved.cadets || makeDefaultCadets();
 
-            return parsed;
-        }
-    } catch (error) {
-        console.error("Unable to load saved data:", error);
+    // Keep older saved records compatible with the current workflow.
+    if (!result.timeline.stage) {
+      result.timeline.stage = result.timeline.started ? "choices" : "initial";
     }
-
-    return defaultState();
+    return result;
+  } catch (error) {
+    return structuredClone(defaultState);
+  }
 }
 
 let state = loadState();
-
 let selectedSquad = state.timeline.squad || "OCT 3";
-let selectedCadetSquad = "OCT 3";
-let selectedStart = "";
-let selectedDestination = "";
+let selectedStartLocation = "";
+let selectedEndLocation = "";
 let selectedNextLocation = "";
-let editingCadetId = null;
+let editingCadet = null;
 
+function saveState() {
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+}
 
-/* =====================================================
+function saveOutput() {
+  state.timeline.output = document.getElementById("sitrepOutput").value;
+  saveState();
+}
+
+/* ------------------------------
    GENERAL HELPERS
-===================================================== */
+------------------------------ */
+
+const locations = [
+  "D Ring","Unity Square","Drill Shed","Mess Hall","OB",
+  "LT","Delta Coy","A Coy","B Coy","C Coy","D Coy","E Coy","F Coy"
+];
 
 function today() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
 }
 
 function currentTime() {
-    const d = new Date();
-    return String(d.getHours()).padStart(2, "0") + ":" +
-           String(d.getMinutes()).padStart(2, "0");
-}
-
-function timeGreeting() {
-    const hour = new Date().getHours();
-
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-}
-
-function defaultGreeting() {
-    return `${timeGreeting()} sirs. I am OCT (IC Name) from ${selectedSquad}.`;
-}
-
-function saveState() {
-    try {
-        localStorage.setItem(STORE, JSON.stringify(state));
-
-        const indicator = document.getElementById("saveIndicator");
-        if (indicator) indicator.textContent = "Saved";
-    } catch (error) {
-        alert("Unable to save data. Your browser storage may be full.");
-    }
-}
-
-function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-    })[char]);
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }
 
 function formatDate(date) {
-    if (!date) return "";
-    const parts = date.split("-");
-    if (parts.length !== 3) return date;
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  if (!date) return "";
+  const [y,m,d] = date.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function formatStatusDate(date) {
+  if (!date) return "";
+  const [y,m,d] = date.split("-");
+  return `${d}/${m}/${y.slice(-2)}`;
 }
 
 function formatTime(time) {
-    if (!time) return "";
-    return time.replace(":", "");
+  return (time || "").replace(":","");
+}
+
+function timeGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
 }
 
 function expandedLocation(location) {
-    const names = {
-        "A Coy":"Alpha Coy",
-        "B Coy":"Bravo Coy",
-        "C Coy":"Charlie Coy",
-        "D Coy":"Delta Coy",
-        "E Coy":"Echo Coy",
-        "F Coy":"Foxtrot Coy"
-    };
+  if (!location) return "";
+  const names = {
+    "A Coy":"Alpha Coy",
+    "B Coy":"Bravo Coy",
+    "C Coy":"Charlie Coy",
+    "D Coy":"Delta Coy",
+    "E Coy":"Echo Coy",
+    "F Coy":"Foxtrot Coy"
+  };
+  return names[location] || location;
+}
 
-    return names[location] || location;
+function timelineLocation(location) {
+  return expandedLocation(location).toLowerCase();
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g,char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[char]));
+}
+
+/* ------------------------------
+   PAGE NAVIGATION
+------------------------------ */
+
+function showPage(page) {
+  document.getElementById("timelinePage").classList.toggle("hidden",page!=="timeline");
+  document.getElementById("cadetsPage").classList.toggle("hidden",page!=="cadets");
+  document.getElementById("timelineTab").className = page==="timeline" ? "active-tab" : "secondary";
+  document.getElementById("cadetTab").className = page==="cadets" ? "active-tab" : "secondary";
+  if (page==="cadets") renderCadets();
+}
+
+/* ------------------------------
+   SQUAD AND GREETING
+------------------------------ */
+
+function selectSquad() {
+  selectedSquad = document.getElementById("squad").value;
+  state.timeline.squad = selectedSquad;
+  updateGreetingFromIC();
+  updateStrengthDisplays();
+  refreshOutput();
+  saveState();
+}
+
+function updateGreetingFromIC() {
+  const name = document.getElementById("icName").value.trim();
+  const greeting = `${timeGreeting()} sirs. I am OCT ${name || "(IC Name)"} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`;
+
+  document.getElementById("greeting").value = greeting;
+  state.timeline.icName = name;
+  state.timeline.greeting = greeting;
+  state.timeline.squad = selectedSquad;
+  saveState();
 }
 
 function getGreetingText() {
-    const name = document.getElementById("icName").value.trim();
-    let greeting = document.getElementById("greeting").value;
-
-    if (name) {
-        greeting = greeting.replace("(IC Name)", name);
-    }
-
-    greeting = greeting.replaceAll("OCT 3", selectedSquad)
-                       .replaceAll("OCT 4", selectedSquad);
-
-    return greeting;
+  return document.getElementById("greeting").value.trim();
 }
 
-
-/* =====================================================
-   PAGE NAVIGATION
-===================================================== */
-
-function showPage(page, button) {
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-
-    document.getElementById(page + "Page").classList.add("active");
-    button.classList.add("active");
-
-    if (page === "cadets") renderCadets();
-}
-
-
-/* =====================================================
-   SQUAD SELECTION
-===================================================== */
-
-function selectSquad(squad) {
-    selectedSquad = squad;
-    state.timeline.squad = squad;
-
-    document.getElementById("timelineOCT3").classList.toggle("active", squad === "OCT 3");
-    document.getElementById("timelineOCT4").classList.toggle("active", squad === "OCT 4");
-
-    document.getElementById("greeting").value =
-        `${timeGreeting()} sirs. I am OCT ${document.getElementById("icName").value || "(IC Name)"} from ${squad}.`;
-
-    updateStrengthDisplays();
-    saveState();
-}
-
-function selectCadetSquad(squad) {
-    selectedCadetSquad = squad;
-
-    document.getElementById("cadetOCT3").classList.toggle("active", squad === "OCT 3");
-    document.getElementById("cadetOCT4").classList.toggle("active", squad === "OCT 4");
-
-    renderCadets();
-}
-
-
-/* =====================================================
-   CADET SQUAD ASSIGNMENT & STRENGTH
-===================================================== */
+/* ------------------------------
+   CADET STATUS AND STRENGTH
+------------------------------ */
 
 function activeAttachment(cadet) {
-    const a = cadet.attachment;
-
-    if (!a || !a.squad || !a.start) return null;
-
-    const current = today();
-
-    if (a.start > current) return null;
-    if (a.end && a.end < current) return null;
-
-    return a;
+  const a = cadet.attachment;
+  if (!a || !a.squad || !a.start) return false;
+  const now = today();
+  return a.start <= now && (!a.end || a.end >= now);
 }
 
 function squadOf(cadet) {
-    const attachment = activeAttachment(cadet);
-    return attachment ? attachment.squad : cadet.squad;
+  return activeAttachment(cadet) ? cadet.attachment.squad : cadet.squad;
 }
 
 function cadetDeducts(cadet) {
-    return cadet.statuses.some(status => {
-        const category = state.categories.find(
-            c => c.name === status.category
-        );
-
-        return category && category.deduct;
-    });
-}
-
-function getSquadCadets(squad) {
-    return state.cadets.filter(c => squadOf(c) === squad);
+  return cadet.statuses.some(status => {
+    const category = state.categories.find(c=>c.name===status.category);
+    return category && category.deduct;
+  });
 }
 
 function getStrength(squad) {
-    const cadets = getSquadCadets(squad);
-    const total = cadets.length;
-
-    // A cadet with multiple strength-deducting statuses
-    // is only deducted once.
-    const deducted = cadets.filter(c => cadetDeducts(c)).length;
-
-    return {
-        total,
-        current: total - deducted
-    };
+  const members = state.cadets.filter(c=>squadOf(c)===squad);
+  const absent = members.filter(c=>cadetDeducts(c)).length;
+  return {
+    total:members.length,
+    current:members.length-absent
+  };
 }
 
 function updateStrengthDisplays() {
-    const strength = getStrength(selectedSquad);
+  const s = getStrength(selectedSquad);
+  document.getElementById("currentStrength").textContent = s.current;
+  document.getElementById("totalStrength").textContent = s.total;
 
-    document.getElementById("currentStrength").textContent = strength.current;
-    document.getElementById("totalStrength").textContent = strength.total;
-
-    const cadetStrength = getStrength(selectedCadetSquad);
-
-    document.getElementById("cadetCurrentStrength").textContent =
-        cadetStrength.current;
-
-    document.getElementById("cadetTotalStrength").textContent =
-        cadetStrength.total;
+  const cs = document.getElementById("cadetSquad").value;
+  const c = getStrength(cs);
+  document.getElementById("cadetCurrentStrength").textContent = c.current;
+  document.getElementById("cadetTotalStrength").textContent = c.total;
 }
 
-
-/* =====================================================
-   CADET STATUS PAGE
-===================================================== */
-
 function renderCadets() {
-    updateStrengthDisplays();
+  const squad = document.getElementById("cadetSquad").value;
+  const members = state.cadets.filter(c=>squadOf(c)===squad);
+  const groups = new Map();
 
-    const cadets = getSquadCadets(selectedCadetSquad);
-    const groups = {};
+  groups.set("PRESENT",members.filter(c=>!c.statuses.length));
+  state.categories.forEach(category => {
+    groups.set(category.name,members.filter(c=>
+      c.statuses.some(s=>s.category===category.name)
+    ));
+  });
 
-    cadets.forEach(cadet => {
-        if (cadet.statuses.length === 0) {
-            if (!groups["PRESENT"]) groups["PRESENT"] = [];
-            groups["PRESENT"].push(cadet);
-        } else {
-            const uniqueCategories = [...new Set(
-                cadet.statuses.map(s => s.category)
-            )];
-
-            uniqueCategories.forEach(category => {
-                if (!groups[category]) groups[category] = [];
-                groups[category].push(cadet);
-            });
-        }
+  let html = "";
+  for (const [category,list] of groups) {
+    if (!list.length) continue;
+    html += `<div class="cadet-group">
+      <div class="cadet-group-title">
+        <span>${escapeHtml(category)}</span><span>${list.length}</span>
+      </div>
+      <div class="cadet-grid">`;
+    list.forEach(cadet => {
+      const statusText = cadet.statuses.map(s=>s.category).join(", ") || "Present";
+      const expired = cadet.statuses.some(s=>s.end && s.end<today());
+      html += `<button class="cadet-tile ${cadetDeducts(cadet)?"absent":"present"}"
+        onclick="openCadetModal('${cadet.id}')">
+        <strong>${escapeHtml(cadet.name)}</strong>
+        <small>${escapeHtml(statusText)}${expired?" · Check expired date":""}</small>
+      </button>`;
     });
+    html += `</div></div>`;
+  }
 
-    const container = document.getElementById("cadetGroups");
-    container.innerHTML = "";
-
-    // Display PRESENT first.
-    const groupNames = Object.keys(groups).sort((a,b) => {
-        if (a === "PRESENT") return -1;
-        if (b === "PRESENT") return 1;
-        return a.localeCompare(b);
-    });
-
-    groupNames.forEach(groupName => {
-        const section = document.createElement("div");
-
-        const heading = document.createElement("div");
-        heading.className = "group-heading";
-        heading.innerHTML = `
-            <div>${escapeHTML(groupName)}</div>
-            <span>${groups[groupName].length} cadet(s)</span>
-        `;
-
-        const grid = document.createElement("div");
-        grid.className = "cadet-grid";
-
-        groups[groupName].forEach(cadet => {
-            const tile = document.createElement("button");
-            tile.className = "cadet-tile";
-
-            if (groupName === "PRESENT") {
-                tile.classList.add("present");
-            } else {
-                const category = state.categories.find(c => c.name === groupName);
-                tile.classList.add(category && category.deduct ? "absent" : "other");
-            }
-
-            const attachment = activeAttachment(cadet);
-            const squadLabel = attachment ? "Attached" : cadet.squad;
-
-            tile.innerHTML = `
-                <strong>${escapeHTML(cadet.name)}</strong>
-                <small>${escapeHTML(squadLabel)}</small>
-            `;
-
-            tile.onclick = () => openCadetModal(cadet.id);
-            grid.appendChild(tile);
-        });
-
-        section.appendChild(heading);
-        section.appendChild(grid);
-        container.appendChild(section);
-    });
-
-    renderCategorySettings();
+  document.getElementById("cadetGroups").innerHTML = html || "<p class='muted'>No cadets found.</p>";
+  renderCategorySettings();
+  updateStrengthDisplays();
 }
 
 function renderCategorySettings() {
-    const container = document.getElementById("categorySettings");
-    container.innerHTML = "";
-
-    state.categories.forEach((category, index) => {
-        const row = document.createElement("div");
-        row.className = "category-row";
-
-        row.innerHTML = `
-            <div>
-                <strong>${escapeHTML(category.name)}</strong>
-            </div>
-            <label class="inline-check">
-                <input type="checkbox" ${category.deduct ? "checked" : ""}
-                    onchange="changeCategoryDeduction(${index}, this.checked)">
-                Deduct
-            </label>
-            <button class="btn small red"
-                onclick="deleteCategory(${index})">Remove</button>
-        `;
-
-        container.appendChild(row);
-    });
+  const container = document.getElementById("categorySettings");
+  container.innerHTML = state.categories.map((category,index)=>`
+    <div class="category-row">
+      <span>${escapeHtml(category.name)}</span>
+      <label style="margin:0;display:flex;align-items:center;gap:5px">
+        <input type="checkbox" ${category.deduct?"checked":""}
+          onchange="changeCategoryDeduction(${index},this.checked)">
+        Deduct strength
+      </label>
+      <button class="red" style="min-height:30px;padding:5px 8px"
+        onclick="deleteCategory(${index})">Delete</button>
+    </div>
+  `).join("");
 }
 
-function changeCategoryDeduction(index, value) {
-    state.categories[index].deduct = value;
-    saveState();
-    renderCadets();
+function changeCategoryDeduction(index,value) {
+  state.categories[index].deduct = value;
+  saveState();
+  renderCadets();
+  refreshOutput();
 }
 
 function addCategory() {
-    const input = document.getElementById("newCategoryName");
-    const name = input.value.trim();
-
-    if (!name) {
-        alert("Enter a category name.");
-        return;
-    }
-
-    if (state.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-        alert("This category already exists.");
-        return;
-    }
-
-    state.categories.push({
-        name,
-        deduct: document.getElementById("newCategoryDeduct").value === "true"
-    });
-
-    input.value = "";
-    saveState();
-    renderCadets();
+  const input = document.getElementById("newCategory");
+  const name = input.value.trim();
+  if (!name) return alert("Enter a category name.");
+  if (state.categories.some(c=>c.name.toLowerCase()===name.toLowerCase())) {
+    return alert("That category already exists.");
+  }
+  state.categories.push({name,deduct:false});
+  input.value = "";
+  saveState();
+  renderCadets();
 }
 
 function deleteCategory(index) {
-    const category = state.categories[index];
-
-    if (!confirm(`Remove the category "${category.name}"? Existing cadet statuses using this category will also be removed.`)) {
-        return;
-    }
-
-    state.cadets.forEach(cadet => {
-        cadet.statuses = cadet.statuses.filter(
-            s => s.category !== category.name
-        );
-    });
-
-    state.categories.splice(index, 1);
-    saveState();
-    renderCadets();
+  const category = state.categories[index];
+  if (!confirm(`Delete the category "${category.name}"? Existing statuses under it will also be removed.`)) return;
+  state.cadets.forEach(c=>c.statuses=c.statuses.filter(s=>s.category!==category.name));
+  state.categories.splice(index,1);
+  saveState();
+  renderCadets();
+  refreshOutput();
 }
 
-
-/* =====================================================
+/* ------------------------------
    CADET EDITOR
-===================================================== */
+------------------------------ */
 
 function openCadetModal(id) {
-    const cadet = state.cadets.find(c => c.id === id);
-    if (!cadet) return;
+  editingCadet = state.cadets.find(c=>c.id===id);
+  if (!editingCadet) return;
 
-    editingCadetId = id;
+  document.getElementById("editingCadetId").value = id;
+  document.getElementById("editCadetName").value = editingCadet.name;
+  document.getElementById("editCadetSquad").value = editingCadet.squad;
 
-    document.getElementById("editingCadetId").value = id;
-    document.getElementById("editCadetName").value = cadet.name;
-    document.getElementById("editCadetSquad").value = cadet.squad;
+  const attachment = editingCadet.attachment || {};
+  document.getElementById("attachmentSquad").value = attachment.squad || "";
+  document.getElementById("attachmentStart").value = attachment.start || "";
+  document.getElementById("attachmentEnd").value = attachment.end || "";
 
-    document.getElementById("newStatusReason").value = "";
-    document.getElementById("newStatusStart").value = today();
-    document.getElementById("newStatusEnd").value = "";
+  document.getElementById("newStatusStart").value = today();
+  document.getElementById("newStatusEnd").value = "";
+  document.getElementById("newStatusReason").value = "";
 
-    document.getElementById("attachmentSquad").value =
-        cadet.attachment?.squad || "";
-
-    document.getElementById("attachmentStart").value =
-        cadet.attachment?.start || today();
-
-    document.getElementById("attachmentEnd").value =
-        cadet.attachment?.end || "";
-
-    renderCadetStatusList();
-    renderStatusCategoryOptions();
-
-    document.getElementById("cadetModal").classList.add("show");
+  renderStatusCategoryOptions();
+  renderCadetStatusList();
+  document.getElementById("cadetModal").classList.remove("hidden");
 }
 
 function closeCadetModal() {
-    document.getElementById("cadetModal").classList.remove("show");
+  document.getElementById("cadetModal").classList.add("hidden");
+  editingCadet = null;
 }
 
 function renderStatusCategoryOptions() {
-    const select = document.getElementById("newStatusCategory");
-
-    select.innerHTML = state.categories.map(category => `
-        <option value="${escapeHTML(category.name)}">
-            ${escapeHTML(category.name)}
-        </option>
-    `).join("");
+  const select = document.getElementById("newStatusCategory");
+  select.innerHTML = state.categories.map(c=>
+    `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`
+  ).join("");
 }
 
 function renderCadetStatusList() {
-    const cadet = state.cadets.find(c => c.id === editingCadetId);
-    const container = document.getElementById("cadetStatusList");
+  const container = document.getElementById("cadetStatusList");
+  if (!editingCadet) return;
 
-    if (!cadet || cadet.statuses.length === 0) {
-        container.innerHTML = `<p class="muted">No active or recorded statuses.</p>`;
-        return;
-    }
+  if (!editingCadet.statuses.length) {
+    container.innerHTML = "<p class='muted'>No statuses recorded.</p>";
+    return;
+  }
 
-    container.innerHTML = "";
-
-    cadet.statuses.forEach((status, index) => {
-        const item = document.createElement("div");
-        item.className = "status-item";
-
-        item.innerHTML = `
-            <div class="status-top">
-                <strong>${escapeHTML(status.category)}</strong>
-                <button class="btn small red"
-                    onclick="removeCadetStatus(${index})">Remove</button>
-            </div>
-
-            ${status.reason ? `<div>${escapeHTML(status.reason)}</div>` : ""}
-
-            <small>
-                Start: ${escapeHTML(formatDate(status.start) || "-")}
-                &nbsp; | &nbsp;
-                End: ${escapeHTML(formatDate(status.end) || "Ongoing")}
-            </small>
-
-            <div class="muted" style="margin-top:5px">
-                ${status.end && status.end < today()
-                    ? "End date has passed — verify this status."
-                    : "Recorded status"}
-            </div>
-        `;
-
-        container.appendChild(item);
-    });
+  container.innerHTML = editingCadet.statuses.map((status,index)=>{
+    const dateText = status.start || status.end
+      ? `${formatStatusDate(status.start)}${status.end?" - "+formatStatusDate(status.end):" - Further notice"}`
+      : "No dates";
+    const expired = status.end && status.end<today();
+    return `<div class="status-item">
+      <strong>${escapeHtml(status.category)}</strong>
+      <div>${escapeHtml(dateText)}</div>
+      <div>${escapeHtml(status.reason || "")}</div>
+      ${expired?"<div style='color:#c0392b;font-weight:bold'>End date passed – verify status</div>":""}
+      <button class="red" style="margin-top:6px" onclick="removeCadetStatus(${index})">Remove</button>
+    </div>`;
+  }).join("");
 }
 
 function saveCadetDetails() {
-    const cadet = state.cadets.find(c => c.id === editingCadetId);
-    if (!cadet) return;
+  if (!editingCadet) return;
+  const name = document.getElementById("editCadetName").value.trim();
+  if (!name) return alert("Enter the cadet's name.");
 
-    const name = document.getElementById("editCadetName").value.trim();
+  editingCadet.name = name;
+  editingCadet.squad = document.getElementById("editCadetSquad").value;
 
-    if (!name) {
-        alert("Cadet name cannot be empty.");
-        return;
+  const attachmentSquad = document.getElementById("attachmentSquad").value;
+  const attachmentStart = document.getElementById("attachmentStart").value;
+  const attachmentEnd = document.getElementById("attachmentEnd").value;
+
+  if (attachmentSquad) {
+    if (attachmentSquad===editingCadet.squad) {
+      return alert("The temporary squad must be different from the permanent squad.");
     }
+    if (!attachmentStart) return alert("Enter the attachment start date.");
+    if (attachmentEnd && attachmentEnd<attachmentStart) {
+      return alert("Attachment end date cannot be before its start date.");
+    }
+    editingCadet.attachment = {
+      squad:attachmentSquad,start:attachmentStart,end:attachmentEnd
+    };
+  } else {
+    editingCadet.attachment = null;
+  }
 
-    cadet.name = name;
-    cadet.squad = document.getElementById("editCadetSquad").value;
-
-    saveState();
-    renderCadets();
-    updateStrengthDisplays();
-    closeCadetModal();
+  saveState();
+  renderCadets();
+  updateStrengthDisplays();
+  refreshOutput();
+  alert("Cadet details saved.");
 }
 
 function addCadetStatus() {
-    const cadet = state.cadets.find(c => c.id === editingCadetId);
-    if (!cadet) return;
+  if (!editingCadet) return;
+  const category = document.getElementById("newStatusCategory").value;
+  const reason = document.getElementById("newStatusReason").value.trim();
+  const start = document.getElementById("newStatusStart").value;
+  const end = document.getElementById("newStatusEnd").value;
 
-    const category = document.getElementById("newStatusCategory").value;
-    const reason = document.getElementById("newStatusReason").value.trim();
-    const start = document.getElementById("newStatusStart").value;
-    const end = document.getElementById("newStatusEnd").value;
+  if (!category) return alert("Select a category.");
+  if (end && start && end<start) return alert("End date cannot be before start date.");
 
-    if (!start) {
-        alert("Please enter a start date.");
-        return;
-    }
-
-    if (end && end < start) {
-        alert("The end date cannot be before the start date.");
-        return;
-    }
-
-    cadet.statuses.push({
-        id: crypto.randomUUID(),
-        category,
-        reason,
-        start,
-        end
-    });
-
-    saveState();
-    renderCadetStatusList();
-    renderCadets();
-    updateStrengthDisplays();
+  editingCadet.statuses.push({category,reason,start,end});
+  document.getElementById("newStatusReason").value = "";
+  document.getElementById("newStatusEnd").value = "";
+  renderCadetStatusList();
+  saveState();
+  renderCadets();
+  updateStrengthDisplays();
+  refreshOutput();
 }
 
 function removeCadetStatus(index) {
-    const cadet = state.cadets.find(c => c.id === editingCadetId);
-    if (!cadet) return;
-
-    cadet.statuses.splice(index, 1);
-
-    saveState();
-    renderCadetStatusList();
-    renderCadets();
-    updateStrengthDisplays();
+  if (!editingCadet) return;
+  editingCadet.statuses.splice(index,1);
+  renderCadetStatusList();
+  saveState();
+  renderCadets();
+  updateStrengthDisplays();
+  refreshOutput();
 }
 
-function saveAttachment() {
-    const cadet = state.cadets.find(c => c.id === editingCadetId);
-    if (!cadet) return;
+/* ------------------------------
+   SITREP TEXT GENERATION
+------------------------------ */
 
-    const squad = document.getElementById("attachmentSquad").value;
+function getCadetSitrepLines(squad,categoryName) {
+  const members = state.cadets.filter(c=>squadOf(c)===squad);
+  const matching = [];
 
-    if (!squad) {
-        cadet.attachment = null;
-        saveState();
-        renderCadets();
-        updateStrengthDisplays();
-        alert("Temporary attachment removed.");
-        return;
-    }
+  members.forEach(cadet=>{
+    cadet.statuses.forEach(status=>{
+      if (status.category!==categoryName) return;
 
-    if (squad === cadet.squad) {
-        alert("The attachment squad is already the cadet's permanent squad.");
-        return;
-    }
-
-    const start = document.getElementById("attachmentStart").value;
-    const end = document.getElementById("attachmentEnd").value;
-
-    if (!start) {
-        alert("Please enter the attachment start date.");
-        return;
-    }
-
-    if (end && end < start) {
-        alert("The end date cannot be before the start date.");
-        return;
-    }
-
-    cadet.attachment = {
-        squad,
-        start,
-        end
-    };
-
-    saveState();
-    renderCadets();
-    updateStrengthDisplays();
-
-    alert("Temporary attachment saved.");
-}
-
-
-/* =====================================================
-   LOCATION SELECTION
-===================================================== */
-
-const locations = [
-    "D Ring",
-    "Unity Square",
-    "Drill Shed",
-    "Mess Hall",
-    "OB",
-    "LT",
-    "Delta Coy",
-    "A Coy",
-    "B Coy",
-    "C Coy",
-    "D Coy",
-    "E Coy",
-    "F Coy"
-];
-
-function selectLocation(location, type) {
-    if (type === "start") {
-        selectedStart = location;
-
-        // If the selected start is also the old destination,
-        // clear the destination to avoid duplicate selections.
-        if (selectedDestination === location) {
-            selectedDestination = "";
+      let detail = "";
+      if (status.start || status.end) {
+        if (categoryName==="LD") {
+          detail = ` (LD: ${formatStatusDate(status.start)} - ${status.end?formatStatusDate(status.end):"Further notice"})`;
+        } else {
+          detail = ` (${formatStatusDate(status.start)}${status.end?" - "+formatStatusDate(status.end):""})`;
         }
-    }
-
-    if (type === "destination") {
-        if (location === selectedStart) {
-            alert("Starting location and destination cannot be the same.");
-            return;
-        }
-
-        selectedDestination = location;
-    }
-
-    renderInitialLocations();
-    updateInitialRoute();
-}
-
-function renderInitialLocations() {
-    const container = document.getElementById("initialLocations");
-    container.innerHTML = "";
-
-    locations.forEach(location => {
-        const button = document.createElement("button");
-        button.className = "location-btn";
-        button.textContent = location;
-
-        if (location === selectedStart) {
-            button.classList.add("start");
-        }
-
-        if (location === selectedDestination) {
-            button.classList.add("destination");
-        }
-
-        button.onclick = () => {
-            if (!selectedStart || (selectedStart && selectedDestination)) {
-                selectLocation(location, "start");
-                selectedDestination = "";
-                renderInitialLocations();
-                updateInitialRoute();
-            } else {
-                selectLocation(location, "destination");
-            }
-        };
-
-        container.appendChild(button);
+      }
+      if (status.reason) {
+        detail = ` (${status.reason})`;
+      }
+      matching.push(`${cadet.name}${detail}`);
     });
-}
+  });
 
-function updateInitialRoute() {
-    const box = document.getElementById("initialRoute");
-
-    if (selectedStart && selectedDestination) {
-        box.textContent =
-            `${expandedLocation(selectedStart)} → ${expandedLocation(selectedDestination)}`;
-    } else if (selectedStart) {
-        box.textContent = `Starting location: ${expandedLocation(selectedStart)}. Select destination.`;
-    } else {
-        box.textContent = "Select a starting location and destination.";
-    }
-}
-
-function renderNextLocations() {
-    const container = document.getElementById("nextLocations");
-    container.innerHTML = "";
-
-    locations.forEach(location => {
-        const button = document.createElement("button");
-        button.className = "location-btn";
-        button.textContent = location;
-
-        if (location === state.timeline.currentLocation) {
-            button.classList.add("current");
-        }
-
-        if (location === selectedNextLocation) {
-            button.classList.add("destination");
-        }
-
-        button.onclick = () => {
-            if (location === state.timeline.currentLocation) {
-                alert("Choose a different location.");
-                return;
-            }
-
-            selectedNextLocation = location;
-            renderNextLocations();
-            updateNextRoute();
-        };
-
-        container.appendChild(button);
-    });
-}
-
-function updateNextRoute() {
-    const box = document.getElementById("nextRoute");
-
-    if (selectedNextLocation) {
-        box.textContent =
-            `${expandedLocation(state.timeline.currentLocation)} → ${expandedLocation(selectedNextLocation)}`;
-    } else {
-        box.textContent = "Select the next location.";
-    }
-}
-
-function updateMovementAction() {
-    const action = document.getElementById("movementAction").value;
-
-    document.getElementById("nextLocationLabel").textContent =
-        action === "arrived"
-            ? "Next Location (optional)"
-            : "Diverted To (required)";
-}
-
-
-/* =====================================================
-   INITIAL SITREP GENERATION
-===================================================== */
-
-function getCadetSitrepLines(squad) {
-    const cadets = getSquadCadets(squad);
-    const lines = [];
-
-    state.categories.forEach(category => {
-        const matching = cadets.filter(c =>
-            c.statuses.some(s => s.category === category.name)
-        );
-
-        lines.push(`*${category.name} - ${matching.length}*`);
-
-        matching.forEach(cadet => {
-            const statuses = cadet.statuses.filter(
-                s => s.category === category.name
-            );
-
-            statuses.forEach(status => {
-                let line = `${cadet.name}`;
-
-                if (status.reason) {
-                    line += ` (${status.reason})`;
-                } else if (status.start || status.end) {
-                    line += ` (${category.name}: ${formatDateShort(status.start)} - ${formatDateShort(status.end)})`;
-                }
-
-                lines.push(line);
-            });
-        });
-
-        lines.push("");
-    });
-
-    return lines;
-}
-
-function formatDateShort(date) {
-    if (!date) return "";
-    const parts = date.split("-");
-    return `${parts[2]}/${parts[1]}/${parts[0].slice(2)}`;
+  return matching;
 }
 
 function buildSitrep() {
-    const strength = getStrength(selectedSquad);
-    const date = document.getElementById("sitrepDate").value;
-    const name = document.getElementById("icName").value.trim();
+  const squad = selectedSquad;
+  const strength = getStrength(squad);
+  const date = document.getElementById("sitrepDate").value || today();
 
-    const lines = [];
+  let output = `${getGreetingText()}
 
-    lines.push(
-        `${timeGreeting()} sirs. I am OCT ${name} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`
-    );
+Sitrep for ${squad} dated: ${formatDate(date)}
+Total Strength - ${strength.total}
+Current Strength - ${strength.current}
 
-    lines.push("");
+`;
 
-    lines.push(
-        `Sitrep for ${selectedSquad} dated: *${formatDateShort(date)}*`
-    );
+  state.categories.forEach(category=>{
+    const people = getCadetSitrepLines(squad,category.name);
+    output += `*${category.name} - ${people.length}*\n`;
+    if (people.length) output += people.join("\n")+"\n";
+    output += "\n";
+  });
 
-    lines.push(`Total Strength - ${strength.total}`);
-    lines.push(`Current Strength - ${strength.current}`);
+  output += `*CM/FI further instructions*
 
-    lines.push("");
+*Timeline :*
+`;
 
-    lines.push(...getCadetSitrepLines(selectedSquad));
+  const entries = state.timeline.entries || [];
+  entries.forEach(entry=>{
+    output += `${formatTime(entry.time)} - ${entry.text}\n`;
+  });
 
-    lines.push("*CM/FI further instructions*");
-
-    lines.push("");
-
-    lines.push("*Timeline :*");
-
-    if (state.timeline.entries.length) {
-        state.timeline.entries.forEach(entry => {
-            lines.push(
-                `${formatTime(entry.time)} - ${entry.text}`
-            );
-        });
-    }
-
-    return lines.join("\n");
+  return output.trim();
 }
 
+function refreshOutput() {
+  const output = document.getElementById("sitrepOutput");
+  if (!output) return;
+  output.value = buildSitrep();
+  state.timeline.output = output.value;
+  saveState();
+}
+
+/* ------------------------------
+   INITIAL LOCATION SELECTION
+------------------------------ */
+
+function renderInitialLocations() {
+  const container = document.getElementById("initialLocations");
+  container.innerHTML = locations.map(location=>{
+    let selectedClass = "";
+    if (location===selectedStartLocation) selectedClass = "selected-start";
+    if (location===selectedEndLocation) selectedClass = "selected-end";
+
+    return `<button class="location-btn ${selectedClass}"
+      onclick="selectInitialLocation('${location}')">${escapeHtml(location)}</button>`;
+  }).join("");
+}
+
+function selectInitialLocation(location) {
+  if (!selectedStartLocation || (selectedStartLocation && selectedEndLocation)) {
+    selectedStartLocation = location;
+    selectedEndLocation = "";
+  } else if (location===selectedStartLocation) {
+    selectedStartLocation = "";
+  } else {
+    selectedEndLocation = location;
+  }
+
+  renderInitialLocations();
+  updateInitialRoute();
+}
+
+function updateInitialRoute() {
+  const box = document.getElementById("initialRoute");
+  if (selectedStartLocation && selectedEndLocation) {
+    box.textContent = `${expandedLocation(selectedStartLocation)} → ${expandedLocation(selectedEndLocation)}`;
+  } else if (selectedStartLocation) {
+    box.textContent = `Starting location: ${expandedLocation(selectedStartLocation)}. Select a destination.`;
+  } else {
+    box.textContent = "Select a starting location.";
+  }
+}
+
+/* ------------------------------
+   INITIAL SITREP WORKFLOW
+------------------------------ */
+
 function generateInitial() {
-    if (!selectedStart || !selectedDestination) {
-        alert("Please select both a starting location and destination.");
-        return;
+  if (!selectedStartLocation || !selectedEndLocation) {
+    return alert("Select both a starting location and destination.");
+  }
+
+  const time = document.getElementById("initialTime").value;
+  const date = document.getElementById("initialDate").value;
+  if (!time || !date) return alert("Enter the movement time and date.");
+
+  state.timeline.squad = selectedSquad;
+  state.timeline.startLocation = selectedStartLocation;
+  state.timeline.currentLocation = selectedStartLocation;
+  state.timeline.destination = selectedEndLocation;
+  state.timeline.entries = [{
+    date,time,
+    text:`${selectedSquad} leaving ${timelineLocation(selectedStartLocation)} for ${timelineLocation(selectedEndLocation)}`
+  }];
+  state.timeline.started = true;
+  state.timeline.stage = "review";
+
+  document.getElementById("initialMovementCard").classList.add("hidden");
+  document.getElementById("ongoingMovementCard").classList.remove("hidden");
+  document.getElementById("accumulatedCard").classList.remove("hidden");
+  document.getElementById("outputCard").classList.remove("hidden");
+
+  document.getElementById("currentLocationDisplay").textContent = expandedLocation(selectedStartLocation);
+  document.getElementById("movementChoices").classList.add("hidden");
+  document.getElementById("diversionSelection").classList.add("hidden");
+
+  renderTimelineEntries();
+  refreshOutput();
+  saveState();
+}
+
+/* ------------------------------
+   ARRIVED / DIVERTED WORKFLOW
+------------------------------ */
+
+function showMovementChoices() {
+  document.getElementById("movementChoices").classList.remove("hidden");
+  document.getElementById("diversionSelection").classList.add("hidden");
+}
+
+function generateArrived() {
+  const time = currentTime();
+  const date = today();
+
+  state.timeline.entries.push({
+    date,time,
+    text:`${selectedSquad} arrived at ${timelineLocation(state.timeline.currentLocation)}`
+  });
+
+  state.timeline.stage = "review";
+  document.getElementById("movementChoices").classList.add("hidden");
+  document.getElementById("diversionSelection").classList.add("hidden");
+
+  renderTimelineEntries();
+  refreshOutput();
+  saveState();
+}
+
+function showDiversionOptions() {
+  selectedNextLocation = "";
+  document.getElementById("movementChoices").classList.add("hidden");
+  document.getElementById("diversionSelection").classList.remove("hidden");
+
+  document.getElementById("updateTime").value = currentTime();
+  document.getElementById("updateDate").value = today();
+
+  renderNextLocations();
+  updateNextRoute();
+}
+
+function renderNextLocations() {
+  const container = document.getElementById("nextLocations");
+  container.innerHTML = locations.map(location=>{
+    const selected = location===selectedNextLocation ? "selected-end" : "";
+    return `<button class="location-btn ${selected}"
+      onclick="selectNextLocation('${location}')">${escapeHtml(location)}</button>`;
+  }).join("");
+}
+
+function selectNextLocation(location) {
+  selectedNextLocation = location;
+  renderNextLocations();
+  updateNextRoute();
+}
+
+function updateNextRoute() {
+  const box = document.getElementById("nextRoute");
+  box.textContent = selectedNextLocation
+    ? `${expandedLocation(state.timeline.currentLocation)} → ${expandedLocation(selectedNextLocation)}`
+    : "Select the new destination.";
+}
+
+function cancelDiversion() {
+  selectedNextLocation = "";
+  document.getElementById("diversionSelection").classList.add("hidden");
+  document.getElementById("movementChoices").classList.remove("hidden");
+}
+
+function generateDiverted() {
+  if (!selectedNextLocation) return alert("Select the diversion destination.");
+
+  const time = document.getElementById("updateTime").value;
+  const date = document.getElementById("updateDate").value;
+  if (!time || !date) return alert("Enter the update time and date.");
+
+  const previousLocation = state.timeline.currentLocation;
+
+  state.timeline.entries.push({
+    date,time,
+    text:`${selectedSquad} diverted from ${timelineLocation(previousLocation)} to ${timelineLocation(selectedNextLocation)}`
+  });
+
+  state.timeline.currentLocation = selectedNextLocation;
+  state.timeline.destination = selectedNextLocation;
+  state.timeline.stage = "review";
+  selectedNextLocation = "";
+
+  document.getElementById("currentLocationDisplay").textContent =
+    expandedLocation(state.timeline.currentLocation);
+
+  document.getElementById("diversionSelection").classList.add("hidden");
+  document.getElementById("movementChoices").classList.add("hidden");
+
+  renderTimelineEntries();
+  refreshOutput();
+  saveState();
+}
+
+/* ------------------------------
+   TIMELINE DISPLAY
+------------------------------ */
+
+function renderTimelineEntries() {
+  const container = document.getElementById("timelineEntries");
+  const entries = state.timeline.entries || [];
+
+  container.innerHTML = entries.map(entry=>`
+    <div class="timeline-entry">
+      <strong>${formatTime(entry.time)}</strong> - ${escapeHtml(entry.text)}
+    </div>
+  `).join("") || "<p class='muted'>No movement entries yet.</p>";
+}
+
+/* ------------------------------
+   SHARE / COPY
+------------------------------ */
+
+async function shareSitrep() {
+  const text = document.getElementById("sitrepOutput").value;
+  if (!text.trim()) return alert("Generate a SITREP first.");
+
+  state.timeline.output = text;
+  state.timeline.stage = "choices";
+  saveState();
+
+  // The next workflow options appear after the IC clicks Share SITREP.
+  document.getElementById("movementChoices").classList.remove("hidden");
+  document.getElementById("diversionSelection").classList.add("hidden");
+
+  if (navigator.share) {
+    try {
+      await navigator.share({title:"OCT SITREP",text});
+    } catch (error) {
+      if (error.name!=="AbortError") copySitrep();
     }
+  } else {
+    copySitrep();
+  }
+}
 
-    const time = document.getElementById("initialTime").value;
-    const date = document.getElementById("initialMovementDate").value;
+async function copySitrep() {
+  const text = document.getElementById("sitrepOutput").value;
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("SITREP copied.");
+  } catch (error) {
+    const output = document.getElementById("sitrepOutput");
+    output.select();
+    document.execCommand("copy");
+    alert("SITREP copied.");
+  }
+}
 
-    if (!time || !date) {
-        alert("Please select a movement time and date.");
-        return;
-    }
+/* ------------------------------
+   RESET AND RESTORE
+------------------------------ */
 
-    state.timeline.squad = selectedSquad;
-    state.timeline.icName = document.getElementById("icName").value;
-    state.timeline.greeting = document.getElementById("greeting").value;
-    state.timeline.date = document.getElementById("sitrepDate").value;
+function resetMovement() {
+  if (!confirm("Reset the current movement timeline? Cadet statuses will not be deleted.")) return;
 
-    state.timeline.started = true;
-    state.timeline.startLocation = selectedStart;
-    state.timeline.currentLocation = selectedDestination;
-    state.timeline.destination = selectedDestination;
+  state.timeline.started = false;
+  state.timeline.stage = "initial";
+  state.timeline.startLocation = "";
+  state.timeline.currentLocation = "";
+  state.timeline.destination = "";
+  state.timeline.entries = [];
+  state.timeline.output = "";
 
-    state.timeline.entries = [];
+  selectedStartLocation = "";
+  selectedEndLocation = "";
+  selectedNextLocation = "";
 
-    state.timeline.entries.push({
-        date,
-        time,
-        text: `${selectedSquad} departed ${expandedLocation(selectedStart)} and proceeded to ${expandedLocation(selectedDestination)}.`
-    });
+  document.getElementById("initialMovementCard").classList.remove("hidden");
+  document.getElementById("ongoingMovementCard").classList.add("hidden");
+  document.getElementById("accumulatedCard").classList.add("hidden");
+  document.getElementById("outputCard").classList.add("hidden");
 
+  document.getElementById("sitrepOutput").value = "";
+  document.getElementById("movementChoices").classList.add("hidden");
+  document.getElementById("diversionSelection").classList.add("hidden");
+
+  renderInitialLocations();
+  updateInitialRoute();
+  saveState();
+}
+
+function restoreTimeline() {
+  const t = state.timeline;
+
+  selectedSquad = t.squad || "OCT 3";
+  document.getElementById("squad").value = selectedSquad;
+  document.getElementById("icName").value = t.icName || "";
+
+  document.getElementById("sitrepDate").value = today();
+  document.getElementById("sitrepTime").value = currentTime();
+  document.getElementById("initialDate").value = today();
+  document.getElementById("initialTime").value = currentTime();
+
+  document.getElementById("greeting").value =
+    t.greeting || `${timeGreeting()} sirs. I am OCT ${t.icName || "(IC Name)"} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`;
+
+  if (t.started) {
     document.getElementById("initialMovementCard").classList.add("hidden");
     document.getElementById("ongoingMovementCard").classList.remove("hidden");
     document.getElementById("accumulatedCard").classList.remove("hidden");
     document.getElementById("outputCard").classList.remove("hidden");
 
-    selectedNextLocation = "";
     document.getElementById("currentLocationDisplay").textContent =
-        expandedLocation(state.timeline.currentLocation);
+      expandedLocation(t.currentLocation);
 
-    document.getElementById("updateTime").value = currentTime();
-    document.getElementById("updateDate").value = today();
-
-    renderNextLocations();
     renderTimelineEntries();
-    updateNextRoute();
-    refreshOutput();
 
-    saveState();
-}
+    document.getElementById("sitrepOutput").value =
+      t.output || buildSitrep();
 
-
-/* =====================================================
-   ONGOING MOVEMENT UPDATES
-===================================================== */
-
-function generateUpdate() {
-    const action = document.getElementById("movementAction").value;
-    const time = document.getElementById("updateTime").value;
-    const date = document.getElementById("updateDate").value;
-
-    if (!time || !date) {
-        alert("Please select the update time and date.");
-        return;
-    }
-
-    const current = state.timeline.currentLocation;
-
-    if (action === "diverted" && !selectedNextLocation) {
-        alert("Please select the diversion location.");
-        return;
-    }
-
-    if (action === "arrived") {
-        state.timeline.entries.push({
-            date,
-            time,
-            text: `${selectedSquad} arrived at ${expandedLocation(current)}.`
-        });
-
-        if (selectedNextLocation) {
-            state.timeline.entries.push({
-                date,
-                time,
-                text: `${selectedSquad} departed ${expandedLocation(current)} and proceeded to ${expandedLocation(selectedNextLocation)}.`
-            });
-
-            state.timeline.currentLocation = selectedNextLocation;
-        }
-    }
-
-    if (action === "diverted") {
-        state.timeline.entries.push({
-            date,
-            time,
-            text: `${selectedSquad} was diverted from ${expandedLocation(current)} to ${expandedLocation(selectedNextLocation)}.`
-        });
-
-        state.timeline.currentLocation = selectedNextLocation;
-    }
-
-    selectedNextLocation = "";
-
-    document.getElementById("currentLocationDisplay").textContent =
-        expandedLocation(state.timeline.currentLocation);
-
-    document.getElementById("updateTime").value = currentTime();
-    document.getElementById("updateDate").value = today();
-
-    renderNextLocations();
-    updateNextRoute();
-    renderTimelineEntries();
-    refreshOutput();
-
-    saveState();
-
-    shareSitrep();
-}
-
-function renderTimelineEntries() {
-    const container = document.getElementById("timelineEntries");
-    container.innerHTML = "";
-
-    state.timeline.entries.forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "timeline-entry";
-
-        div.innerHTML = `
-            <small>${escapeHTML(formatDate(entry.date))} ${escapeHTML(formatTime(entry.time))}</small>
-            ${escapeHTML(entry.text)}
-        `;
-
-        container.appendChild(div);
-    });
-}
-
-
-/* =====================================================
-   OUTPUT & SHARING
-===================================================== */
-
-function refreshOutput() {
-    const output = buildSitrep();
-    document.getElementById("sitrepOutput").value = output;
-
-    state.timeline.output = output;
-    saveState();
-}
-
-function copySitrep() {
-    const text = document.getElementById("sitrepOutput").value;
-
-    if (!text.trim()) {
-        alert("Generate a SITREP first.");
-        return;
-    }
-
-    navigator.clipboard.writeText(text)
-        .then(() => alert("SITREP copied."))
-        .catch(() => {
-            document.getElementById("sitrepOutput").select();
-            document.execCommand("copy");
-            alert("SITREP copied.");
-        });
-}
-
-async function shareSitrep() {
-    const text = document.getElementById("sitrepOutput").value;
-
-    if (!text.trim()) {
-        alert("Generate a SITREP first.");
-        return;
-    }
-
-    if (navigator.share) {
-        try {
-            await navigator.share({
-                title: "OCT SITREP",
-                text: text
-            });
-        } catch (error) {
-            if (error.name !== "AbortError") {
-                copySitrep();
-            }
-        }
+    if (t.stage==="choices") {
+      showMovementChoices();
     } else {
-        copySitrep();
+      document.getElementById("movementChoices").classList.add("hidden");
+      document.getElementById("diversionSelection").classList.add("hidden");
     }
+  }
+
+  renderInitialLocations();
+  updateInitialRoute();
 }
 
-
-/* =====================================================
-   RESET MOVEMENT
-===================================================== */
-
-function resetMovement() {
-    if (!confirm("Start a new movement SITREP? The existing movement timeline will be cleared.")) {
-        return;
-    }
-
-    state.timeline.started = false;
-    state.timeline.startLocation = "";
-    state.timeline.currentLocation = "";
-    state.timeline.destination = "";
-    state.timeline.entries = [];
-    state.timeline.output = "";
-
-    selectedStart = "";
-    selectedDestination = "";
-    selectedNextLocation = "";
-
-    document.getElementById("initialMovementCard").classList.remove("hidden");
-    document.getElementById("ongoingMovementCard").classList.add("hidden");
-    document.getElementById("accumulatedCard").classList.add("hidden");
-    document.getElementById("outputCard").classList.add("hidden");
-
-    document.getElementById("initialTime").value = currentTime();
-    document.getElementById("initialMovementDate").value = today();
-
-    renderInitialLocations();
-    updateInitialRoute();
-
-    saveState();
-}
-
-
-/* =====================================================
-   INITIALISATION
-===================================================== */
+/* ------------------------------
+   INITIALISE
+------------------------------ */
 
 function initialise() {
-    // Restore saved timeline details.
-    document.getElementById("icName").value =
-        state.timeline.icName || "";
-
-    document.getElementById("sitrepDate").value =
-        state.timeline.date || today();
-
-    document.getElementById("greeting").value =
-        state.timeline.greeting ||
-        `${timeGreeting()} sirs. I am OCT (IC Name) from ${selectedSquad}.`;
-
-    document.getElementById("initialTime").value = currentTime();
-    document.getElementById("initialMovementDate").value = today();
-    document.getElementById("updateTime").value = currentTime();
-    document.getElementById("updateDate").value = today();
-
-    document.getElementById("icName").addEventListener("input", () => {
-        saveState();
-    });
-
-    document.getElementById("greeting").addEventListener("input", () => {
-        state.timeline.greeting =
-            document.getElementById("greeting").value;
-        saveState();
-    });
-
-    document.getElementById("sitrepDate").addEventListener("change", () => {
-        state.timeline.date =
-            document.getElementById("sitrepDate").value;
-        saveState();
-    });
-
-    document.getElementById("timelineOCT3").classList.toggle(
-        "active", selectedSquad === "OCT 3"
-    );
-
-    document.getElementById("timelineOCT4").classList.toggle(
-        "active", selectedSquad === "OCT 4"
-    );
-
-    renderInitialLocations();
-    updateInitialRoute();
-    updateStrengthDisplays();
-
-    if (state.timeline.started) {
-        document.getElementById("initialMovementCard").classList.add("hidden");
-        document.getElementById("ongoingMovementCard").classList.remove("hidden");
-        document.getElementById("accumulatedCard").classList.remove("hidden");
-        document.getElementById("outputCard").classList.remove("hidden");
-
-        document.getElementById("currentLocationDisplay").textContent =
-            expandedLocation(state.timeline.currentLocation);
-
-        renderNextLocations();
-        renderTimelineEntries();
-
-        document.getElementById("sitrepOutput").value =
-            state.timeline.output || buildSitrep();
-    }
-
-    renderCadets();
-    saveState();
+  document.getElementById("cadetSquad").value = selectedSquad;
+  restoreTimeline();
+  updateStrengthDisplays();
+  renderCadets();
 }
 
 initialise();
-
 </script>
-
 </body>
 </html>
