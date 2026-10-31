@@ -63,6 +63,7 @@ textarea { min-height:240px; resize:vertical; line-height:1.5; }
 }
 .location-btn.selected-start { background:#e1f5e9; border-color:var(--green); }
 .location-btn.selected-end { background:#fde8e7; border-color:var(--red); }
+.location-btn:disabled { opacity:1; cursor:not-allowed; }
 .route-box {
   background:#f0f5fa; border-radius:8px; padding:11px;
   margin-top:10px; font-size:13px; font-weight:700;
@@ -164,7 +165,7 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
       </div>
       <div style="margin-top:10px">
         <label>Greeting (editable)</label>
-        <textarea id="greeting" style="min-height:75px" oninput="saveState()"></textarea>
+        <textarea id="greeting" style="min-height:75px" oninput="saveGreeting()"></textarea>
       </div>
       <div class="row" style="margin-top:10px">
         <div class="field">
@@ -189,10 +190,10 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
       </div>
     </div>
 
-    <!-- INITIAL MOVEMENT -->
+    <!-- INITIAL / NEXT MOVEMENT LOCATION SELECTION -->
     <div class="card" id="initialMovementCard">
-      <h2>Initial Movement</h2>
-      <p class="muted">Select the starting location first, followed by the destination.</p>
+      <h2 id="initialMovementHeading">Initial Movement</h2>
+      <p class="muted" id="initialMovementInstructions">Select the starting location first, followed by the destination.</p>
       <div class="location-grid" id="initialLocations"></div>
       <div class="route-box" id="initialRoute">Select a starting location.</div>
       <div class="row" style="margin-top:12px">
@@ -212,8 +213,9 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
     <div class="card hidden" id="ongoingMovementCard">
       <h2>Movement Update</h2>
       <div class="movement-status">
-        Current Location:
+        Last Confirmed Location:
         <strong id="currentLocationDisplay">-</strong>
+        <div class="muted" id="destinationDisplay"></div>
       </div>
 
       <div id="movementChoices" class="hidden">
@@ -251,7 +253,7 @@ hr { border:0; border-top:1px solid var(--border); margin:13px 0; }
     <div class="card hidden" id="outputCard">
       <h2>Generated SITREP</h2>
       <textarea id="sitrepOutput" oninput="saveOutput()"></textarea>
-      <button class="primary full" style="margin-top:10px" onclick="shareSitrep()">Share SITREP</button>
+      <button class="primary full" id="shareButton" style="margin-top:10px" onclick="shareSitrep()">Share SITREP</button>
       <button class="secondary full" style="margin-top:8px" onclick="copySitrep()">Copy SITREP</button>
     </div>
 
@@ -452,7 +454,6 @@ function loadState() {
     result.categories = saved.categories || structuredClone(defaultCategories);
     result.cadets = saved.cadets || makeDefaultCadets();
 
-    // Keep older saved records compatible with the current workflow.
     if (!result.timeline.stage) {
       result.timeline.stage = result.timeline.started ? "choices" : "initial";
     }
@@ -475,6 +476,11 @@ function saveState() {
 
 function saveOutput() {
   state.timeline.output = document.getElementById("sitrepOutput").value;
+  saveState();
+}
+
+function saveGreeting() {
+  state.timeline.greeting = document.getElementById("greeting").value;
   saveState();
 }
 
@@ -909,29 +915,48 @@ function refreshOutput() {
 }
 
 /* ------------------------------
-   INITIAL LOCATION SELECTION
+   INITIAL / NEXT LOCATION SELECTION
 ------------------------------ */
 
 function renderInitialLocations() {
   const container = document.getElementById("initialLocations");
+  const isNextMovement = state.timeline.started;
+
   container.innerHTML = locations.map(location=>{
     let selectedClass = "";
-    if (location===selectedStartLocation) selectedClass = "selected-start";
-    if (location===selectedEndLocation) selectedClass = "selected-end";
+    let disabled = false;
+
+    if (isNextMovement) {
+      if (location===state.timeline.currentLocation) {
+        selectedClass = "selected-start";
+        disabled = true;
+      } else if (location===selectedEndLocation) {
+        selectedClass = "selected-end";
+      }
+    } else {
+      if (location===selectedStartLocation) selectedClass = "selected-start";
+      if (location===selectedEndLocation) selectedClass = "selected-end";
+    }
 
     return `<button class="location-btn ${selectedClass}"
+      ${disabled?"disabled":""}
       onclick="selectInitialLocation('${location}')">${escapeHtml(location)}</button>`;
   }).join("");
 }
 
 function selectInitialLocation(location) {
-  if (!selectedStartLocation || (selectedStartLocation && selectedEndLocation)) {
-    selectedStartLocation = location;
-    selectedEndLocation = "";
-  } else if (location===selectedStartLocation) {
-    selectedStartLocation = "";
-  } else {
+  if (state.timeline.started) {
+    if (location===state.timeline.currentLocation) return;
     selectedEndLocation = location;
+  } else {
+    if (!selectedStartLocation || (selectedStartLocation && selectedEndLocation)) {
+      selectedStartLocation = location;
+      selectedEndLocation = "";
+    } else if (location===selectedStartLocation) {
+      selectedStartLocation = "";
+    } else {
+      selectedEndLocation = location;
+    }
   }
 
   renderInitialLocations();
@@ -940,7 +965,14 @@ function selectInitialLocation(location) {
 
 function updateInitialRoute() {
   const box = document.getElementById("initialRoute");
-  if (selectedStartLocation && selectedEndLocation) {
+
+  if (state.timeline.started) {
+    if (selectedEndLocation) {
+      box.textContent = `${expandedLocation(state.timeline.currentLocation)} → ${expandedLocation(selectedEndLocation)}`;
+    } else {
+      box.textContent = `Current location: ${expandedLocation(state.timeline.currentLocation)}. Select the next destination.`;
+    }
+  } else if (selectedStartLocation && selectedEndLocation) {
     box.textContent = `${expandedLocation(selectedStartLocation)} → ${expandedLocation(selectedEndLocation)}`;
   } else if (selectedStartLocation) {
     box.textContent = `Starting location: ${expandedLocation(selectedStartLocation)}. Select a destination.`;
@@ -950,12 +982,24 @@ function updateInitialRoute() {
 }
 
 /* ------------------------------
-   INITIAL SITREP WORKFLOW
+   INITIAL / NEXT MOVEMENT SITREP
 ------------------------------ */
 
 function generateInitial() {
-  if (!selectedStartLocation || !selectedEndLocation) {
-    return alert("Select both a starting location and destination.");
+  const isNextMovement = state.timeline.started;
+
+  const startLocation = isNextMovement
+    ? state.timeline.currentLocation
+    : selectedStartLocation;
+
+  const endLocation = selectedEndLocation;
+
+  if (!startLocation || !endLocation) {
+    return alert("Select a starting location and destination.");
+  }
+
+  if (startLocation===endLocation) {
+    return alert("Starting location and destination cannot be the same.");
   }
 
   const time = document.getElementById("initialTime").value;
@@ -963,13 +1007,19 @@ function generateInitial() {
   if (!time || !date) return alert("Enter the movement time and date.");
 
   state.timeline.squad = selectedSquad;
-  state.timeline.startLocation = selectedStartLocation;
-  state.timeline.currentLocation = selectedStartLocation;
-  state.timeline.destination = selectedEndLocation;
-  state.timeline.entries = [{
+
+  if (!isNextMovement) {
+    state.timeline.startLocation = startLocation;
+    state.timeline.currentLocation = startLocation;
+  }
+
+  state.timeline.destination = endLocation;
+
+  state.timeline.entries.push({
     date,time,
-    text:`${selectedSquad} leaving ${timelineLocation(selectedStartLocation)} for ${timelineLocation(selectedEndLocation)}`
-  }];
+    text:`${selectedSquad} leaving ${timelineLocation(startLocation)} for ${timelineLocation(endLocation)}`
+  });
+
   state.timeline.started = true;
   state.timeline.stage = "review";
 
@@ -978,7 +1028,11 @@ function generateInitial() {
   document.getElementById("accumulatedCard").classList.remove("hidden");
   document.getElementById("outputCard").classList.remove("hidden");
 
-  document.getElementById("currentLocationDisplay").textContent = expandedLocation(selectedStartLocation);
+  document.getElementById("currentLocationDisplay").textContent =
+    expandedLocation(state.timeline.currentLocation);
+  document.getElementById("destinationDisplay").textContent =
+    `Destination: ${expandedLocation(state.timeline.destination)}`;
+
   document.getElementById("movementChoices").classList.add("hidden");
   document.getElementById("diversionSelection").classList.add("hidden");
 
@@ -997,15 +1051,29 @@ function showMovementChoices() {
 }
 
 function generateArrived() {
+  if (!state.timeline.destination) {
+    return alert("There is no destination recorded for this movement.");
+  }
+
+  const arrivedLocation = state.timeline.destination;
   const time = currentTime();
   const date = today();
 
+  // Update the last confirmed location only when Arrived is selected.
+  state.timeline.currentLocation = arrivedLocation;
+
   state.timeline.entries.push({
     date,time,
-    text:`${selectedSquad} arrived at ${timelineLocation(state.timeline.currentLocation)}`
+    text:`${selectedSquad} arrived at ${timelineLocation(arrivedLocation)}`
   });
 
-  state.timeline.stage = "review";
+  state.timeline.stage = "arrived-review";
+
+  document.getElementById("currentLocationDisplay").textContent =
+    expandedLocation(state.timeline.currentLocation);
+  document.getElementById("destinationDisplay").textContent =
+    "Arrival recorded.";
+
   document.getElementById("movementChoices").classList.add("hidden");
   document.getElementById("diversionSelection").classList.add("hidden");
 
@@ -1014,8 +1082,30 @@ function generateArrived() {
   saveState();
 }
 
+function showNextMovementSelection() {
+  selectedStartLocation = state.timeline.currentLocation;
+  selectedEndLocation = "";
+
+  document.getElementById("ongoingMovementCard").classList.add("hidden");
+  document.getElementById("initialMovementCard").classList.remove("hidden");
+
+  document.getElementById("initialMovementHeading").textContent = "Next Movement";
+  document.getElementById("initialMovementInstructions").textContent =
+    "Your last confirmed location is shown in green. Select your next destination in red.";
+
+  document.getElementById("initialTime").value = currentTime();
+  document.getElementById("initialDate").value = today();
+
+  state.timeline.stage = "next-location";
+
+  renderInitialLocations();
+  updateInitialRoute();
+  saveState();
+}
+
 function showDiversionOptions() {
   selectedNextLocation = "";
+
   document.getElementById("movementChoices").classList.add("hidden");
   document.getElementById("diversionSelection").classList.remove("hidden");
 
@@ -1028,6 +1118,7 @@ function showDiversionOptions() {
 
 function renderNextLocations() {
   const container = document.getElementById("nextLocations");
+
   container.innerHTML = locations.map(location=>{
     const selected = location===selectedNextLocation ? "selected-end" : "";
     return `<button class="location-btn ${selected}"
@@ -1044,7 +1135,7 @@ function selectNextLocation(location) {
 function updateNextRoute() {
   const box = document.getElementById("nextRoute");
   box.textContent = selectedNextLocation
-    ? `${expandedLocation(state.timeline.currentLocation)} → ${expandedLocation(selectedNextLocation)}`
+    ? `${expandedLocation(state.timeline.destination)} → ${expandedLocation(selectedNextLocation)}`
     : "Select the new destination.";
 }
 
@@ -1057,24 +1148,31 @@ function cancelDiversion() {
 function generateDiverted() {
   if (!selectedNextLocation) return alert("Select the diversion destination.");
 
+  if (selectedNextLocation===state.timeline.destination) {
+    return alert("Select a different diversion destination.");
+  }
+
   const time = document.getElementById("updateTime").value;
   const date = document.getElementById("updateDate").value;
   if (!time || !date) return alert("Enter the update time and date.");
 
-  const previousLocation = state.timeline.currentLocation;
+  const previousDestination = state.timeline.destination;
 
   state.timeline.entries.push({
     date,time,
-    text:`${selectedSquad} diverted from ${timelineLocation(previousLocation)} to ${timelineLocation(selectedNextLocation)}`
+    text:`${selectedSquad} diverted from ${timelineLocation(previousDestination)} to ${timelineLocation(selectedNextLocation)}`
   });
 
-  state.timeline.currentLocation = selectedNextLocation;
+  // Keep currentLocation as the last confirmed arrival.
+  // The new destination becomes the location the squad is heading towards.
   state.timeline.destination = selectedNextLocation;
-  state.timeline.stage = "review";
+  state.timeline.stage = "diverted-review";
   selectedNextLocation = "";
 
   document.getElementById("currentLocationDisplay").textContent =
     expandedLocation(state.timeline.currentLocation);
+  document.getElementById("destinationDisplay").textContent =
+    `New destination: ${expandedLocation(state.timeline.destination)}`;
 
   document.getElementById("diversionSelection").classList.add("hidden");
   document.getElementById("movementChoices").classList.add("hidden");
@@ -1107,35 +1205,90 @@ async function shareSitrep() {
   const text = document.getElementById("sitrepOutput").value;
   if (!text.trim()) return alert("Generate a SITREP first.");
 
-  state.timeline.output = text;
-  state.timeline.stage = "choices";
-  saveState();
+  const button = document.getElementById("shareButton");
+  if (button.disabled) return;
 
-  // The next workflow options appear after the IC clicks Share SITREP.
-  document.getElementById("movementChoices").classList.remove("hidden");
-  document.getElementById("diversionSelection").classList.add("hidden");
+  button.disabled = true;
+  button.textContent = "Waiting for sharing to complete...";
 
-  if (navigator.share) {
-    try {
-      await navigator.share({title:"OCT SITREP",text});
-    } catch (error) {
-      if (error.name!=="AbortError") copySitrep();
+  try {
+    if (navigator.share) {
+      // Wait until the native sharing sheet closes.
+      await navigator.share({
+        title:"OCT SITREP",
+        text
+      });
+
+      // Reaching this point means the share action was completed
+      // rather than cancelled.
+      completeShareWorkflow();
+
+    } else {
+      // If native sharing is unavailable, use clipboard as the fallback.
+      const copied = await copySitrep(false);
+      if (copied) {
+        completeShareWorkflow();
+      }
     }
-  } else {
-    copySitrep();
+  } catch (error) {
+    if (error.name==="AbortError") {
+      // The user cancelled the sharing sheet.
+      // Keep the current page and SITREP available.
+      return;
+    }
+
+    alert("Sharing was unsuccessful. Your SITREP is still available to try again.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Share SITREP";
   }
 }
 
-async function copySitrep() {
+function completeShareWorkflow() {
+  const stage = state.timeline.stage;
+
+  if (stage==="arrived-review") {
+    // After sharing an arrival SITREP, return to location selection.
+    showNextMovementSelection();
+    return;
+  }
+
+  if (stage==="review" || stage==="diverted-review") {
+    // After sharing a movement or diversion SITREP, show next actions.
+    state.timeline.stage = "choices";
+
+    document.getElementById("initialMovementCard").classList.add("hidden");
+    document.getElementById("ongoingMovementCard").classList.remove("hidden");
+
+    document.getElementById("currentLocationDisplay").textContent =
+      expandedLocation(state.timeline.currentLocation);
+
+    document.getElementById("destinationDisplay").textContent =
+      `Destination: ${expandedLocation(state.timeline.destination)}`;
+
+    showMovementChoices();
+    saveState();
+  }
+}
+
+async function copySitrep(showMessage=true) {
   const text = document.getElementById("sitrepOutput").value;
+
   try {
     await navigator.clipboard.writeText(text);
-    alert("SITREP copied.");
+    if (showMessage) alert("SITREP copied.");
+    return true;
   } catch (error) {
     const output = document.getElementById("sitrepOutput");
     output.select();
-    document.execCommand("copy");
-    alert("SITREP copied.");
+
+    const successful = document.execCommand("copy");
+
+    if (showMessage) {
+      alert(successful ? "SITREP copied." : "Unable to copy SITREP.");
+    }
+
+    return successful;
   }
 }
 
@@ -1163,9 +1316,16 @@ function resetMovement() {
   document.getElementById("accumulatedCard").classList.add("hidden");
   document.getElementById("outputCard").classList.add("hidden");
 
+  document.getElementById("initialMovementHeading").textContent = "Initial Movement";
+  document.getElementById("initialMovementInstructions").textContent =
+    "Select the starting location first, followed by the destination.";
+
   document.getElementById("sitrepOutput").value = "";
   document.getElementById("movementChoices").classList.add("hidden");
   document.getElementById("diversionSelection").classList.add("hidden");
+
+  document.getElementById("currentLocationDisplay").textContent = "-";
+  document.getElementById("destinationDisplay").textContent = "";
 
   renderInitialLocations();
   updateInitialRoute();
@@ -1188,25 +1348,51 @@ function restoreTimeline() {
     t.greeting || `${timeGreeting()} sirs. I am OCT ${t.icName || "(IC Name)"} from ${selectedSquad}. Here is the Sitrep for the ${selectedSquad}.`;
 
   if (t.started) {
-    document.getElementById("initialMovementCard").classList.add("hidden");
-    document.getElementById("ongoingMovementCard").classList.remove("hidden");
     document.getElementById("accumulatedCard").classList.remove("hidden");
     document.getElementById("outputCard").classList.remove("hidden");
-
-    document.getElementById("currentLocationDisplay").textContent =
-      expandedLocation(t.currentLocation);
 
     renderTimelineEntries();
 
     document.getElementById("sitrepOutput").value =
       t.output || buildSitrep();
 
-    if (t.stage==="choices") {
-      showMovementChoices();
+    document.getElementById("currentLocationDisplay").textContent =
+      expandedLocation(t.currentLocation);
+
+    document.getElementById("destinationDisplay").textContent =
+      t.destination ? `Destination: ${expandedLocation(t.destination)}` : "";
+
+    if (t.stage==="next-location") {
+      // Restore the next-location selector after a page reload.
+      document.getElementById("initialMovementCard").classList.remove("hidden");
+      document.getElementById("ongoingMovementCard").classList.add("hidden");
+
+      selectedStartLocation = t.currentLocation;
+      selectedEndLocation = "";
+
+      document.getElementById("initialMovementHeading").textContent = "Next Movement";
+      document.getElementById("initialMovementInstructions").textContent =
+        "Your last confirmed location is shown in green. Select your next destination in red.";
+
+      renderInitialLocations();
+      updateInitialRoute();
+
     } else {
+      document.getElementById("initialMovementCard").classList.add("hidden");
+      document.getElementById("ongoingMovementCard").classList.remove("hidden");
+
       document.getElementById("movementChoices").classList.add("hidden");
       document.getElementById("diversionSelection").classList.add("hidden");
+
+      if (t.stage==="choices") {
+        showMovementChoices();
+      }
     }
+  } else {
+    document.getElementById("initialMovementCard").classList.remove("hidden");
+    document.getElementById("ongoingMovementCard").classList.add("hidden");
+    document.getElementById("accumulatedCard").classList.add("hidden");
+    document.getElementById("outputCard").classList.add("hidden");
   }
 
   renderInitialLocations();
